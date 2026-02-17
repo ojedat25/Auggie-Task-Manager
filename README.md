@@ -1,6 +1,6 @@
 # AuggieTaskManager
 
-Electron desktop app with a Django REST backend and React frontend. The app spawns the Django server automatically when you run it.
+Electron desktop app with a Django REST backend and React frontend.
 
 ## Prerequisites
 
@@ -82,19 +82,48 @@ npm install
 
 ## 4. Run the app
 
-From the repo root:
+### Option A: VS Code (Windows and macOS)
+
+1. Open the repo in VS Code.
+2. Run the **Start App** task for your OS:
+   - **Terminal → Run Task…**, or **Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`) → **Tasks: Run Task**
+   - Choose **Start App (Windows)** or **Start App (macOS)**.
+   - On Windows, **Ctrl+Shift+B** runs the default build task (Start App (Windows)).
+3. Two terminals open: one for Django (backend), one for Electron (frontend). Keep both running while you work.
+
+### Option B: Two terminals manually
+
+**Terminal 1 – Backend (Windows):**
+
+```powershell
+cd backend\auggietaskmanager
+..\venv\Scripts\python.exe manage.py runserver
+```
+
+**Terminal 1 – Backend (macOS / Linux):**
+
+```bash
+cd backend/auggietaskmanager
+../venv/bin/python manage.py runserver
+```
+
+**Terminal 2 – Frontend (Windows):**
 
 ```powershell
 cd frontend\AuggieTaskManagerFrontend
 npm start
 ```
 
-**macOS / Linux:** `cd frontend/AuggieTaskManagerFrontend` then `npm start`.
+**Terminal 2 – Frontend (macOS / Linux):**
 
-This starts Electron; the main process will start Django (`python manage.py runserver`) automatically. You do not need to run the backend in a separate terminal.
+```bash
+cd frontend/AuggieTaskManagerFrontend
+npm start
+```
 
 ## Project layout
 
 - `backend/venv` — Python virtualenv for Django
 - `backend/auggietaskmanager/` — Django project (e.g. `manage.py`, `auggietaskmanager/settings.py`)
-- `frontend/AuggieTaskManagerFrontend/` — Electron + Webpack + React app; run `npm start` here
+- `frontend/AuggieTaskManagerFrontend/` — Electron + Webpack + React app
+- `.vscode/tasks.json` — **Start App (Windows)** and **Start App (macOS)** run backend + frontend in two terminals

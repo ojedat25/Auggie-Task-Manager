@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: Django (Windows)",
+      "type": "shell",
+      "command": "${workspaceFolder}/backend/venv/Scripts/python.exe",
+      "args": ["manage.py", "runserver"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend/auggietaskmanager",
+        "env": { "PYTHONUNBUFFERED": "1" }
+      },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "start" }
+    },
+    {
+      "label": "Backend: Django (macOS)",
+      "type": "shell",
+      "command": "${workspaceFolder}/backend/venv/bin/python",
+      "args": ["manage.py", "runserver"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend/auggietaskmanager",
+        "env": { "PYTHONUNBUFFERED": "1" }
+      },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "start" }
+    },
+    {
+      "label": "Frontend: Electron",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend/AuggieTaskManagerFrontend",
+        "env": {}
+      },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "start" }
+    },
+    {
+      "label": "Start App (Windows)",
+      "dependsOn": ["Backend: Django (Windows)", "Frontend: Electron"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "Start App (macOS)",
+      "dependsOn": ["Backend: Django (macOS)", "Frontend: Electron"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ]
+}

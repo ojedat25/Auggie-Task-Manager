@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django.contrib.staticfiles',
     'rest_framework',
-    
+    'moodle',
 ]
 
 MIDDLEWARE = [
