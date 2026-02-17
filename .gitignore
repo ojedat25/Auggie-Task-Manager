@@ -9,6 +9,28 @@ lerna-debug.log*
 
 venv
 
+# Django
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+db.sqlite3
+db.sqlite3-journal
+*.pot
+media/
+staticfiles/
+# pytest / testing
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+pytest_cache/
+*.cover
+.tox/
+.mypy_cache/
+settings.cpython-310.pyc
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
