@@ -1,14 +1,36 @@
 [tool.ruff]
 target-version = "py310"
-line-length = 200
+line-length = 120
 src = ["backend"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "UP"]
-ignore = []
+# Extended selection for Django projects
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "DJ",  # flake8-django (Essential for Django!)
+    "T20", # flake8-print (Prevents accidental print statements)
+    "B",   # flake8-bugbear (Common logic bugs)
+    "C4",  # flake8-comprehensions
+]
+
+ignore = [
+    "DJ001", # Ignore "Avoid using Null=True on string-based fields" if you prefer it
+    "N806",  # Optional: ignore non-lowercase variable in functions (sometimes helpful in views)
+]
+
+[tool.ruff.lint.isort]
+# Ensures your Django imports are grouped correctly
+section-order = ["future", "standard-library", "third-party", "django", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+# Special group for Django to keep it separate from other third-party libs
+"django" = ["django"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"

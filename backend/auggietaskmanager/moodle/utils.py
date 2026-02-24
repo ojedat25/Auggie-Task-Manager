@@ -4,7 +4,7 @@ from icalendar import Calendar
 import pytz
 
 
-def extract_calendar_data():
+def extract_calendar_data(calendar_url):
     """Extracts the data from the calendar_url and puts into json format
 
     Args:
@@ -13,7 +13,6 @@ def extract_calendar_data():
         Calendar: calendar object containing all the events in the calendar
     """
     central_tz = pytz.timezone("America/Chicago")
-    calendar_url = "https://moodle.augsburg.edu/moodle2021/calendar/export_execute.php?userid=12513&authtoken=79c6051c6291eedd78af084112b043c2a57532cc&preset_what=all&preset_time=custom"
 
     response = requests.get(calendar_url)
 
@@ -26,7 +25,7 @@ def extract_calendar_data():
             {
                 "title": str(calendar_event.get("summary")),
                 "description": str(calendar_event.get("description")),
-                "due_date": calendar_event.get("dtend").dt.astimezone(central_tz).isoformat(),  # Convert to Central Time by subtracting 6 hours
+                "due_date": calendar_event.get("dtend").dt.astimezone(central_tz).isoformat(),  # Convert to Central Time
                 "course": str(calendar_event.get("categories").cats[0].to_ical().decode("utf-8"))[:15],
             }
         )
