@@ -32,7 +32,7 @@ print_error() {
 # Run unittest tests
 run_unittest_all() {
     print_header "Running All Tests (unittest)"
-    python -m unittest tests.test_moodle_calendar_unit -v
+    python -m unittest tests.test_moodle_calendar_unit tests.test_moodle_calendar_integration -v
 }
 
 
