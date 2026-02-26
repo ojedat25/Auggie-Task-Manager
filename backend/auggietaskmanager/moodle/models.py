@@ -14,7 +14,7 @@ class Task(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
 
     # Task status
-    completed = models.BooleanField(default=False)
+    completed = models.BooleanField(default=False) 
 
 
     # Indicates where the task came from (manual entry or Moodle import)
@@ -27,5 +27,5 @@ class Task(models.Model):
     # Automatically records when the task was created in the database
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self): 
         return self.title
