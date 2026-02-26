@@ -28,9 +28,9 @@ print_error() {
     echo -e "${RED}✗ $1${NC}"
 }
 
-# Run unittest tests
-run_unittest_all() {
-    print_header "Running All Tests (unittest)"
+# Run tests
+run_test_all() {
+    print_header "Running All Tests"
     python manage.py test tests.test_moodle_calendar_unit tests.test_moodle_calendar_integration --verbosity=2
 }
 
@@ -38,7 +38,7 @@ run_unittest_all() {
 # Main command handler
 case "${1:-all}" in
     "all")
-        run_unittest_all
+        run_test_all
         ;;
 esac
 
