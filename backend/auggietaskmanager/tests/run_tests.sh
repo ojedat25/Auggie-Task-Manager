@@ -31,7 +31,7 @@ print_error() {
 # Run unittest tests
 run_unittest_all() {
     print_header "Running All Tests (unittest)"
-    python manage.py test tests.test_moodle_calendar_unit tests.test_moodle_calendar_integration -v
+    python manage.py test tests.test_moodle_calendar_unit tests.test_moodle_calendar_integration --verbosity=2
 }
 
 
