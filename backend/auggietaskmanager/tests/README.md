@@ -23,31 +23,15 @@ pip install -r requirements.txt
 
 ## Running Tests
 
-### Quick Start
-
-The easiest way to run all tests is using the provided test runner script:
-
-```bash
-# From the backend/auggietaskmanager directory
-cd backend/auggietaskmanager
-
-# Make the script executable (first time only)
-chmod +x tests/run_tests.sh
-
-# Run all tests
-./tests/run_tests.sh
-```
-
-### Alternative Methods
-
-#### Run All Tests with Django
+### Run All Tests
 
 ```bash
 # From backend/auggietaskmanager directory
+cd backend/auggietaskmanager
 python manage.py test tests --verbosity=2
 ```
 
-#### Run Specific Test Files
+### Run Specific Test Files
 
 ```bash
 # Run only unit tests
@@ -57,14 +41,14 @@ python manage.py test tests.test_moodle_calendar_unit --verbosity=2
 python manage.py test tests.test_moodle_calendar_integration --verbosity=2
 ```
 
-#### Run Specific Test Classes
+### Run Specific Test Classes
 
 ```bash
 # Run a specific test class
 python manage.py test tests.test_moodle_calendar_unit.TestExtractCalendarData --verbosity=2
 ```
 
-#### Run Individual Test Methods
+### Run Individual Test Methods
 
 ```bash
 # Run a single test method
@@ -153,9 +137,14 @@ python manage.py test tests --verbosity=3
 
 ## Continuous Integration
 
-The test suite is designed to be run in CI/CD pipelines. The `run_tests.sh` script returns appropriate exit codes:
+The test suite is designed to be run in CI/CD pipelines. The Django test command returns appropriate exit codes:
 - `0` - All tests passed
 - `1` - One or more tests failed
+
+Example CI/CD command:
+```bash
+python manage.py test tests --verbosity=2
+```
 
 ## Troubleshooting
 
@@ -175,14 +164,6 @@ pip install -r requirements.txt
 
 **Solution:** Django automatically creates a test database. Ensure your database settings in `settings.py` are correct.
 
-### Permission Denied on run_tests.sh
-
-**Problem:** `Permission denied` when running the script
-
-**Solution:** Make the script executable:
-```bash
-chmod +x tests/run_tests.sh
-```
 
 ## Writing New Tests
 
