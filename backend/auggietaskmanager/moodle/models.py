@@ -29,3 +29,10 @@ class Task(models.Model):
 
     def __str__(self): 
         return self.title
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    moodle_user_id = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.user.username
