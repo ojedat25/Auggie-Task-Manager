@@ -30,12 +30,4 @@ class Task(models.Model):
     def __str__(self): 
         return self.title
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    schoolYear = models.CharField(max_length=20, blank=True)
-    majors = models.CharField(max_length=50, blank=True)
-    minors = models.CharField(max_length=50, blank=True)
-    bio = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.user.username
