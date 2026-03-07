@@ -38,6 +38,7 @@
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
     "autoprefixer": "^10.4.27",
     "css-loader": "^6.11.0",
+    "daisyui": "^5.5.19",
     "electron": "40.4.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
