@@ -1,4 +1,5 @@
-/* Global / Tailwind entry. Add @tailwind directives when Tailwind is installed. */
+@import 'tailwindcss';
+
 body {
   font-family:
     -apple-system,
