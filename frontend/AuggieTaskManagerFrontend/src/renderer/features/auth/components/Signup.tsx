@@ -4,9 +4,9 @@ import { useAuth } from '../hooks/useAuth';
 import { SignupData } from '../../../types/user';
 import { AlertCard } from '../../../components/common/AlertCard';
 import { SignUpForm } from './SignUpForm';
-
+import { AuthService } from '../services/authService';
 export const Signup = () => {
-    const { user, signup, error, message } = useAuth();
+    const { signup, error, message } = useAuth();
 
     const initialFormData: SignupData = {
         firstname: '',
@@ -23,10 +23,10 @@ export const Signup = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) {
+        if (AuthService.isAuthenticated()) {
             navigate('/dashboard');
         }
-    }, [user, navigate]);
+    }, [navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

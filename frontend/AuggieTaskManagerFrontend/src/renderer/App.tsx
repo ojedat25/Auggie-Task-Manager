@@ -4,11 +4,9 @@
  */
 import { SignUpLayout } from './components/layout/SignUpLayout';
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from './features/auth/hooks/useAuth';
+import { AuthService } from './features/auth/services/authService';
 export const ProtectedRoute = () => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>; // or a spinner
-  if (!user) return <Navigate to="/signup" replace />; // or "/signup"
+  if (!AuthService.isAuthenticated()) return <Navigate to="/signup" replace />; //change to  "/login" when implemented
   return <Outlet />;
 };
 function App() {

@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
 import { AuthService } from '../services/authService';
-import { SignupData, UserProfile } from '../../../types/user';
+import { SignupData } from '../../../types/user';
 
 export const useAuth = () => {
-  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,5 +24,5 @@ export const useAuth = () => {
     }
   };
 
-  return { user, loading, error, message, signup };
+  return { loading, error, message, signup };
 };
