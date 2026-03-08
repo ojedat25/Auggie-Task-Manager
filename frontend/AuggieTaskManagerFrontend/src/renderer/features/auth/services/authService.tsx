@@ -4,6 +4,8 @@ import { UserProfile, SignupData } from '../../../types/user';
 
 
 export class AuthService {
+    private static TOKEN_KEY = 'auggie_token';
+
 
     static async getUserProfile(): Promise<UserProfile> {
         try {
@@ -21,6 +23,19 @@ export class AuthService {
         } catch (error) {
             throw new Error(error.response?.data?.error || 'Signup failed');
         }
+    }
+
+    static async saveToken(token: string) {
+        sessionStorage.setItem(this.TOKEN_KEY, token);
+    }
+    static async getToken() {
+        return sessionStorage.getItem(this.TOKEN_KEY);
+    }
+    static async removeToken() {
+        sessionStorage.removeItem(this.TOKEN_KEY);
+    }
+    static async isAuthenticated() {
+        return this.getToken() !== null;
     }
 
     // Add other auth methods like login, logout, getCurrentUser here as needed
