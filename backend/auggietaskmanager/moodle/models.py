@@ -25,7 +25,13 @@ class Task(models.Model):
     )
 
     # Automatically records when the task was created in the database
+    course = models.CharField(max_length=200, blank=True)
+    external_id = models.CharField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['due_date']
 
     def __str__(self): 
         return self.title
