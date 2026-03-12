@@ -10,6 +10,5 @@ router.register(r"tasks", views.TaskViewSet, basename="task")
 
 urlpatterns = [
     path("", views.api_root),
-    path("health/", views.health, name="health"),
     path("", include(router.urls)),
 ]
