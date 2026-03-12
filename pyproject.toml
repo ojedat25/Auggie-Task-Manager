@@ -21,6 +21,7 @@ select = [
 ignore = [
     "DJ001", # Ignore "Avoid using Null=True on string-based fields" if you prefer it
     "N806",  # Optional: ignore non-lowercase variable in functions (sometimes helpful in views)
+    "W293",  # Blank line contains whitespace
 ]
 
 [tool.ruff.lint.isort]
