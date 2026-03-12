@@ -10,5 +10,30 @@ export const axiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// axiosInstance.interceptors.request.use((config) => { /* e.g. add token */ return config; });
-// axiosInstance.interceptors.response.use((r) => r, (err) => { /* e.g. 401 logout */ return Promise.reject(err); });
+// Request interceptor: attach auth token to every request if it exists
+axiosInstance.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem('auggie_token');
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+// Response interceptor: handle authentication errors
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid → clear stored session
+      sessionStorage.removeItem('auggie_token');
+      sessionStorage.removeItem('user');
+
+      // Redirect user back to login page
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  }
+);
