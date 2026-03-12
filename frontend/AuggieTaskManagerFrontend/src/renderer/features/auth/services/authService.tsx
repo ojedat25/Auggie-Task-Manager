@@ -43,9 +43,9 @@ export class AuthService {
 
       // Store the authentication token for future requests
       this.saveToken(token);
-
-      // Store user data in sessionStorage
-      sessionStorage.setItem('user', JSON.stringify(user));
+      // Also save user data for easy access
+      this.saveUser(user); 
+      
 
       return response.data;
     } catch (error: any) {
@@ -77,6 +77,12 @@ export class AuthService {
   static getCurrentUser() {
     const userJson = sessionStorage.getItem('user');
     return userJson ? JSON.parse(userJson) : null;
+  }
+
+  // Save the current user's data to sessionStorage
+  static saveUser(user: UserProfile): void {
+    // Store user data in sessionStorage
+      sessionStorage.setItem('user', JSON.stringify(user));
   }
 
   // Log out the user by clearing stored authentication data
