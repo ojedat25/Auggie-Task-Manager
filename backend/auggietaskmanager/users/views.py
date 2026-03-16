@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -75,4 +77,31 @@ class UserLoginView(APIView):
                 "message": "Login successful.",     
             },
             status = 200
+        )
+
+
+class UserProfileView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+        return Response(
+            {
+                "user": {
+                    "id": request.user.id,
+                    "username": request.user.username,
+                    "email": request.user.email,
+                    "first_name": request.user.first_name,
+                    "last_name": request.user.last_name,
+                },
+                "profile": {
+                    "schoolYear": profile.schoolYear,
+                    "major": profile.major,
+                    "minor": profile.minor,
+                    "bio": profile.bio,
+                },
+            },
+            status=200,
         )

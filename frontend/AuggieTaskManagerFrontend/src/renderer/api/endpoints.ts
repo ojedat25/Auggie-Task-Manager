@@ -6,4 +6,5 @@ export const ENDPOINTS = {
   AUTH_LOGIN: '/users/login/',
   AUTH_LOGOUT: '/users/logout/',
   AUTH_ME: '/users/me/',
+  PROFILE_ME: '/users/profile/',
 } as const;
