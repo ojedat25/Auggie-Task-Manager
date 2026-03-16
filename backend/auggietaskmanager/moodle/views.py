@@ -63,7 +63,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         # Validate that the Moodle URL is a valid URL
         try:
             calendar_data = extract_calendar_data(moodle_url)
-            tasks = add_moodle_tasks(calendar_data)
+            tasks = add_moodle_tasks(calendar_data, request.user)
 
             serializer = self.get_serializer(tasks, many=True)
             return Response(
