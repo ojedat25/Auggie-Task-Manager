@@ -3,6 +3,8 @@ import requests
 from icalendar import Calendar
 import pytz
 from .models import Task
+
+
 def extract_calendar_data(calendar_url):
     """Extracts the data from the calendar_url and puts into json format
 
@@ -22,29 +24,43 @@ def extract_calendar_data(calendar_url):
     for calendar_event in calendar.walk("vevent"):
         calendar_events.append(
             {
+                "external_id": str(calendar_event.get("uid")),
                 "title": str(calendar_event.get("summary")),
                 "description": str(calendar_event.get("description")),
-                "due_date": calendar_event.get("dtend").dt.astimezone(central_tz).isoformat(),  # Convert to Central Time
+                "due_date": calendar_event.get("dtend")
+                .dt.astimezone(central_tz)
+                .isoformat(),  # Convert to Central Time
                 "course": str(calendar_event.get("categories").cats[0].to_ical().decode("utf-8"))[:15],
             }
         )
 
     return calendar_events
 
-def add_moodle_tasks(calendar_events):
+
+def add_moodle_tasks(calendar_events, user):
     """adds the tasks to the database
 
     Args:
         calendar_events (List[Dict]): list of calendar events
     """
-    for calendar_event in calendar_events:
-        Task.objects.create(
-            title=calendar_event["title"],
-            description=calendar_event["description"],
-            due_date=calendar_event["due_date"],
-            course=calendar_event["course"],
-        )
-    
+    # Add the tasks to the database in bulk
+    created_tasks = Task.objects.bulk_create(
+        [
+            Task(
+                user=user,
+                external_id=calendar_event["external_id"],
+                title=calendar_event["title"],
+                description=calendar_event["description"],
+                due_date=calendar_event["due_date"],
+                course=calendar_event["course"],
+                source="moodle",
+            )
+            for calendar_event in calendar_events
+        ]
+    )
+    return created_tasks
+
+
 def get_user_moodle_tasks(user_id):
     """gets the tasks for the user
 
@@ -53,7 +69,8 @@ def get_user_moodle_tasks(user_id):
     Returns:
         List[Task]: list of moodle tasks
     """
-    return Task.objects.filter(user_id=user_id, source = "moodle")
+    return Task.objects.filter(user_id=user_id, source="moodle")
+
 
 def get_user_tasks(user_id):
     """get user manual tasks
@@ -64,6 +81,7 @@ def get_user_tasks(user_id):
         List[Task]: list of manual tasks
     """
     return Task.objects.filter(user_id=user_id, source="manual")
+
 
 def user_add_manual_task(manual_tasks):
     """adds a manual task to the database
