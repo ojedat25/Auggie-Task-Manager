@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 type AlertType = 'info' | 'success' | 'warning' | 'error';
 
-interface AlertCardProps {
+export interface AlertCardProps {
     type: AlertType;
     message: string;
 }

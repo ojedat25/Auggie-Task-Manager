@@ -53,6 +53,17 @@ export class AuthService {
     }
   }
 
+  static async logOut(): Promise<{ message: string }> {
+    try { 
+      const response = await axiosInstance.post(ENDPOINTS.AUTH_LOGOUT);
+      this.removeToken();
+      this.removeUser();
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Logout failed');
+    }
+  }
+
   // Save authentication token to sessionStorage
   static saveToken(token: string): void {
     sessionStorage.setItem(this.TOKEN_KEY, token);
@@ -85,9 +96,8 @@ export class AuthService {
       sessionStorage.setItem('user', JSON.stringify(user));
   }
 
-  // Log out the user by clearing stored authentication data
-  static logOut(): void {
-    this.removeToken();
+  static removeUser(): void {
     sessionStorage.removeItem('user');
   }
+
 }

@@ -3,6 +3,7 @@ import { MemoryRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import { AuthService } from './features/auth/services/authService';
 import Login from './features/auth/components/Login';
 import LoginLayout from './components/layout/LogInLayout';
+import DashboardLayout from './components/layout/DashboardLayout';
 
 export const ProtectedRoute = () => {
   if (!AuthService.isAuthenticated()) return <Navigate to="/login" replace />;
@@ -15,7 +16,7 @@ function App() {
       <Routes>
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<div>Dashboard placeholder</div>} />
+          <Route path="/" element={<DashboardLayout />} />
         </Route>
 
         {/* Public routes */}
