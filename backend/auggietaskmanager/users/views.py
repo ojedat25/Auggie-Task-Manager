@@ -1,11 +1,11 @@
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
 
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
-#from django.shortcuts import render
 from .models import UserProfile
 
 # Create your views here.
@@ -54,8 +54,8 @@ class UserLoginView(APIView):
             return Response({"error": "Invalid Credentials"}, status = 401)
         
         auth_user = authenticate(username = user.username, password = password)
-        if auth_user is None: 
-            return Response({"error": "Invalid Credentials"}, status = 401)
+        if auth_user is None:
+            return Response({"error": "Invalid Credentials"}, status=401)
 
         token, _ = Token.objects.get_or_create(user = auth_user)
         
@@ -65,14 +65,23 @@ class UserLoginView(APIView):
             "username": auth_user.username,
             "email": auth_user.email,
             "first_name": auth_user.first_name,
-            "last_name": auth_user.last_name,    
+            "last_name": auth_user.last_name,
         }
         # Response matches frontend AuthResonse shape
         return Response(
             {
                 "token": token.key,
                 "user": user_data,
-                "message": "Login successful.",     
+                "message": "Login successful.",
             },
             status = 200
         )
+
+
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        Token.objects.filter(user=request.user).delete()
+        return Response({"message": "Logout successful."}, status=200)
+

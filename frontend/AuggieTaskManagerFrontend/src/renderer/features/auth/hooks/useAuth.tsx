@@ -8,7 +8,9 @@ export const useAuth = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const signup = async (data: SignupData): Promise<{ message: string } | null> => {
+  const signup = async (
+    data: SignupData
+  ): Promise<{ message: string } | null> => {
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -25,7 +27,9 @@ export const useAuth = () => {
     }
   };
 
-  const logIn = async (credentials: LoginData): Promise<{ message: string } | null> => {
+  const logIn = async (
+    credentials: LoginData
+  ): Promise<{ message: string } | null> => {
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -44,11 +48,22 @@ export const useAuth = () => {
     }
   };
 
-  return {
-    loading,
-    error,
-    message,
-    signup,
-    logIn,
+  const logOut = async (): Promise<{ message: string } | null> => {
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const { message } = await AuthService.logOut();
+      setMessage(message);
+      return { message };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Logout failed';
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
+
+  return { loading, error, message, signup, logIn, logOut };
 };

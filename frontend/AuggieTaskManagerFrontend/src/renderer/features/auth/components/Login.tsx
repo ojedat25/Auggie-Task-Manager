@@ -41,11 +41,11 @@ export const Login = () => {
     }
   }, [navigate]);
 
-  // Effect: When login succeeds (message appears), wait 2 seconds then redirect
+  // Effect: When login succeeds (message appears), wait 1 second then redirect
   // This gives user time to see the success message before navigating
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => navigate('/'), 2000);
+      const timer = setTimeout(() => navigate('/'), 1000);
       return () => clearTimeout(timer); // Clean up timer if component unmounts
     }
   }, [message, navigate]);
