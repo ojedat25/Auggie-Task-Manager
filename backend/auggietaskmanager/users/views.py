@@ -94,6 +94,7 @@ class UserProfileView(APIView):
         user_profile = UserProfile.objects.get(user=user)
         return Response({
             "user": user,
+            "schoolYear": user_profile.schoolYear,
             "major": user_profile.major,
             "minor": user_profile.minor,
             "bio": user_profile.bio,
@@ -102,12 +103,14 @@ class UserProfileView(APIView):
     def patch(self, request): # Updates the user's profile data
         user = request.user
         user_profile = UserProfile.objects.get(user=user)
+        user_profile.schoolYear = request.data.get("schoolYear", user_profile.schoolYear)
         user_profile.major = request.data.get("major", user_profile.major)
         user_profile.minor = request.data.get("minor", user_profile.minor)
         user_profile.bio = request.data.get("bio", user_profile.bio)
         user_profile.save()
         return Response({
             "user": user,
+            "schoolYear": user_profile.schoolYear,
             "major": user_profile.major,
             "minor": user_profile.minor,
             "bio": user_profile.bio,
