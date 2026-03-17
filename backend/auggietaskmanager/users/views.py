@@ -80,7 +80,4 @@ class UserLoginView(APIView):
         )
 
 
-class UserProfileView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
 
