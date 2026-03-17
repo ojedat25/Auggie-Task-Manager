@@ -86,9 +86,10 @@ class UserLogoutView(APIView):
         return Response({"message": "Logout successful."}, status=200)
 
 class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
     
-    def get(self, request):
+    permission_classes = [IsAuthenticated] # Only authenticated users can access this view, uses default authentication class
+    
+    def get(self, request): # Gets the user's profile data
         user = request.user
         user_profile = UserProfile.objects.get(user=user)
         return Response({
@@ -98,7 +99,7 @@ class UserProfileView(APIView):
             "bio": user_profile.bio,
         }, status=200)
         
-    def patch(self, request):
+    def patch(self, request): # Updates the user's profile data
         user = request.user
         user_profile = UserProfile.objects.get(user=user)
         user_profile.major = request.data.get("major", user_profile.major)
@@ -113,7 +114,7 @@ class UserProfileView(APIView):
             "message": "Profile updated successfully.",
         }, status=200)
     
-    def delete(self, request):
+    def delete(self, request): # Deletes the user from the database and all associated data
         user = request.user
         user.delete()
         return Response({
