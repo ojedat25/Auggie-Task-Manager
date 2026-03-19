@@ -87,13 +87,20 @@ class UserLogoutView(APIView):
 
 class UserProfileView(APIView):
     # Only authenticated users can access this view, uses default authentication class (TokenAuthentication)
-    permission_classes = [IsAuthenticated] 
-    
+    permission_classes = [IsAuthenticated]
+
     def get(self, request): # Gets the user's profile data
         user = request.user
         user_profile = UserProfile.objects.get(user=user)
+        user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
         return Response({
-            "user": user,
+            "user": user_data,
             "schoolYear": user_profile.schoolYear,
             "major": user_profile.major,
             "minor": user_profile.minor,
@@ -109,8 +116,15 @@ class UserProfileView(APIView):
         user_profile.minor = request.data.get("minor", user_profile.minor)
         user_profile.bio = request.data.get("bio", user_profile.bio)
         user_profile.save()
+        user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
         return Response({
-            "user": user,
+            "user": user_data,
             "schoolYear": user_profile.schoolYear,
             "major": user_profile.major,
             "minor": user_profile.minor,
