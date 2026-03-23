@@ -8,6 +8,8 @@ export interface Task {
   user: User;
   title: string;
   description: string;
+  course: string;
+  external_id: string;
   due_date: string;
   completed: boolean;
   source: "manual" | "moodle";
