@@ -14,6 +14,7 @@ export interface UserProfile {
   major: string;
   minor: string | null;
   bio: string | null;
+  moodle_url: string | null;
 }
 
 export interface SignupData {

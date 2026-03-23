@@ -6,9 +6,9 @@ from . import views
 app_name = "moodle"
 
 router = DefaultRouter()
-router.register(r"tasks", views.TaskViewSet, basename="task")
+router.register(r"", views.TaskViewSet, basename="task")
 
 urlpatterns = [
-    path("", views.api_root),
+    path("api/", views.api_root),
     path("", include(router.urls)),
 ]
