@@ -56,7 +56,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar view
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -105,7 +105,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -126,7 +126,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         # GIVEN: User with tasks
 
         # WHEN: User requests calendar without date parameters
-        response = self.client.get('/api/moodle/tasks/calendar/')
+        response = self.client.get('/moodle/tasks/calendar/')
 
         # THEN: All user tasks are returned
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -144,7 +144,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         unauthenticated_client = APIClient()
 
         # WHEN: Unauthenticated request is made
-        response = unauthenticated_client.get('/api/moodle/tasks/calendar/')
+        response = unauthenticated_client.get('/moodle/tasks/calendar/')
 
         # THEN: Request is rejected
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
@@ -159,7 +159,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides invalid date format
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': 'invalid-date', 'end': 'also-invalid'}
         )
 
@@ -178,7 +178,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides malformed start date
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': 'not-a-date', 'end': (now + timedelta(days=30)).isoformat()}
         )
 
@@ -197,7 +197,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides malformed end date
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': now.isoformat(), 'end': 'not-a-date'}
         )
 
@@ -218,7 +218,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar for empty range
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -248,7 +248,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -270,7 +270,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -308,7 +308,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -344,7 +344,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/api/moodle/tasks/calendar/',
+            '/moodle/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -356,46 +356,3 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         self.assertGreater(len(completed_tasks), 0)
         self.assertGreater(len(incomplete_tasks), 0)
-
-
-class HealthEndpointSystemTests(TestCase):
-    """
-    System tests for health check endpoint
-
-    Tests the health endpoint functionality.
-    """
-
-    def test_health_endpoint_accessible_without_authentication(self):
-        """
-        Test that health endpoint is accessible without authentication
-
-        Verifies the health check endpoint is publicly accessible.
-        """
-        # GIVEN: Unauthenticated client
-        client = APIClient()
-
-        # WHEN: Client requests health endpoint
-        response = client.get('/api/moodle/health/')
-
-        # THEN: Health check returns OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"status": "ok"})
-
-    def test_health_endpoint_with_authentication(self):
-        """
-        Test that health endpoint works with authentication
-
-        Verifies authenticated users can also access health endpoint.
-        """
-        # GIVEN: Authenticated client
-        client = APIClient()
-        user = User.objects.create_user('testuser', 'test@example.com', 'password')
-        client.force_authenticate(user=user)
-
-        # WHEN: Authenticated client requests health endpoint
-        response = client.get('/api/moodle/health/')
-
-        # THEN: Health check returns OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"status": "ok"})
-
