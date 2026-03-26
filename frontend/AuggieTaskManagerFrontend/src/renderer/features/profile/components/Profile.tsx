@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProfileService } from '../services/profileService';
-import {UserProfile} from '../../../types/user';
-import {AlertCard} from '../../../components/common/AlertCard';
+import { UserProfile } from '../../../types/user';
+import { AlertCard } from '../../../components/common/AlertCard';
+import { useNavigate } from 'react-router-dom';
+//import { AuthService } from '../../'
 
 /**
  * User Profile Page which shows the currently logged in user's profile data
