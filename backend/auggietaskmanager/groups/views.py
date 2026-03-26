@@ -42,3 +42,34 @@ def study_group_list(request):
         # If the data provided in the request is invalid according to the validation rules defined in the StudyGroupSerializer, the errors encountered during validation are returned in the response. This allows the client to understand what went wrong with the data they submitted and make necessary corrections before trying again.
         else:
             return Response(serializer.errors)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def join_study_group(request, groupID):
+    """
+    POST: Adds the authenticated user to the specified study group
+    """
+    try:
+        group = StudyGroup.objects.get(id=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    group.members.add(request.user)
+    return Response({"message": "Joined study group successfully."}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def leave_study_group(request, groupID):
+    """
+    POST: Removes the authenticated user from the specified study group
+    """
+    try:
+        group = StudyGroup.objects.get(id=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    group.members.remove(request.user)
+    return Response({"message": "Left study group successfully."}, status=status.HTTP_200_OK)
