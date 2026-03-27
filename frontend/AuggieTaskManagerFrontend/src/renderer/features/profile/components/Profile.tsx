@@ -168,25 +168,51 @@ export const Profile: React.FC = () => {
                             />
                         </label>
 
-                        <label className = "fieldset">
-                            <span className = "label">Major</span>
-                            <input
-                                className = "input input-primary validator w-full"
-                                value = {majorInput}
-                                onChange = {(e) => setMajorInput(e.target.value)}
-                                placeholder = "Enter your major"
-                            />
+                        <label className="fieldset">
+                            <span className="label">Major</span>
+                            <select
+                                value={majorInput}
+                                onChange={(e) => setMajorInput(e.target.value)}
+                                className="select select-primary validator"
+                                required
+                            >
+                                <option value="">Select a major</option>
+                                <option value="CS">Computer Science</option>
+                                <option value="CpE">Computer Engineering</option>
+                                <option value="EE">Electrical Engineering</option>
+                                <option value="ME">Mechanical Engineering</option>
+                                <option value="CE">Civil Engineering</option>
+                                <option value="BIO">Biology</option>
+                                <option value="CHEM">Chemistry</option>
+                                <option value="BUS">Business Administration</option>
+                                <option value="PSY">Psychology</option>
+                                <option value="NURS">Nursing</option>
+                                <option value="OTHER">Other</option>
+                            </select>
                         </label>
 
-                        <label className = "fieldset">
-                            <span className = "label">Minor</span>
-                            <input
-                                className = "input input-primary validator w-full"
-                                value = {minorInput}
-                                onChange = {(e) => setMinorInput(e.target.value)}
-                                placeholder = "Leave blank if NA"
-                            />
+                        <label className="fieldset">
+                            <span className="label">Minor</span>
+                            <select
+                                value={minorInput}
+                                onChange={(e) => setMinorInput(e.target.value)}
+                                className="select select-primary validator"
+                            >
+                                <option value="">Select a minor</option>
+                                <option value="CS">Computer Science</option>
+                                <option value="CpE">Computer Engineering</option>
+                                <option value="EE">Electrical Engineering</option>
+                                <option value="ME">Mechanical Engineering</option>
+                                <option value="CE">Civil Engineering</option>
+                                <option value="BIO">Biology</option>
+                                <option value="CHEM">Chemistry</option>
+                                <option value="BUS">Business Administration</option>
+                                <option value="PSY">Psychology</option>
+                                <option value="NURS">Nursing</option>
+                                <option value="OTHER">Other</option>
+                            </select>
                         </label>
+
                         <label className = "fieldset">
                             <span className = "label">Bio</span>
                             <input
