@@ -105,6 +105,7 @@ class UserProfileView(APIView):
             "major": user_profile.major,
             "minor": user_profile.minor,
             "bio": user_profile.bio,
+            "moodle_url": user_profile.moodle_url,
             "created_at": user_profile.created_at,
         }, status=200)
         
@@ -115,6 +116,7 @@ class UserProfileView(APIView):
         user_profile.major = request.data.get("major", user_profile.major)
         user_profile.minor = request.data.get("minor", user_profile.minor)
         user_profile.bio = request.data.get("bio", user_profile.bio)
+        user_profile.moodle_url = request.data.get("moodle_url", user_profile.moodle_url)
         user_profile.save()
         user_data = {
             "id": user.id,
@@ -129,6 +131,7 @@ class UserProfileView(APIView):
             "major": user_profile.major,
             "minor": user_profile.minor,
             "bio": user_profile.bio,
+            "moodle_url": user_profile.moodle_url,
             "created_at": user_profile.created_at,
             "message": "Profile updated successfully.",
         }, status=200)

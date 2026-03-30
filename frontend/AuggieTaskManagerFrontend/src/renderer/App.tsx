@@ -1,7 +1,15 @@
+import { useEffect } from 'react';
 import { SignUpLayout } from './components/layout/SignUpLayout';
-import { MemoryRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import {
+  MemoryRouter,
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
+import { SESSION_EXPIRED_EVENT } from './api/axiosInstance';
 import { AuthService } from './features/auth/services/authService';
-import Login from './features/auth/components/Login';
 import LoginLayout from './components/layout/LogInLayout';
 import DashboardLayout from './components/layout/DashboardLayout';
 
@@ -10,9 +18,22 @@ export const ProtectedRoute = () => {
   return <Outlet />;
 };
 
+function SessionExpiredListener(): null {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const onExpired = () => navigate('/login', { replace: true });
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+  }, [navigate]);
+
+  return null;
+}
+
 function App() {
   return (
-    <MemoryRouter initialEntries={['/login']}> {/* <-- Start at /login */}
+    <MemoryRouter initialEntries={['/login']}>
+      <SessionExpiredListener />
       <Routes>
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
