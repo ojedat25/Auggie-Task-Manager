@@ -12,7 +12,7 @@ export const Tasks = () => {
   const [moodleUrl, setMoodleUrl] = useState<string | null>(
     AuthService.getCurrentUser()?.moodle_url
   );
-  const [hasMoodleUrl, setHasMoodleUrl] = useState<boolean>(moodleUrl !== null);
+  const [hasMoodleUrl, setHasMoodleUrl] = useState<boolean>(false);
 
   const handleImportMoodleTasks = async () => {
     if (moodleUrl) {

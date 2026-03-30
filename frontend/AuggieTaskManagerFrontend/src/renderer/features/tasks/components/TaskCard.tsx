@@ -8,8 +8,8 @@ export interface TaskCardProps {
 
 export const TaskCard = ({ task }: TaskCardProps) => {
   return (
-    <div className="card card-border bg-base-200 w-96">
-      <div className="card-body">
+    <div className="card card-border bg-base-200 w-full">
+      <div className="card-body w-full">
         <h2 className="card-title">{task.title}</h2>
         <p>{task.description || 'No description.'}</p>
         {task.due_date != null && task.due_date !== '' && (
