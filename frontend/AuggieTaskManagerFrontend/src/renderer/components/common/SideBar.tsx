@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 export type SideBarItem = { name: string; icon: LucideIcon };
-import { useEffect } from 'react';
+
 interface SideBarProps {
   sideBarItems: SideBarItem[];
   activeItem: string | null;

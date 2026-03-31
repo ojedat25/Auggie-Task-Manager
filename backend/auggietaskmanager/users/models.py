@@ -17,6 +17,9 @@ class UserProfile(models.Model):
     # A brief bio or description about the user
     bio = models.TextField(max_length = 250, blank=True)
 
+    # Moodle calendar iCal URL (used for importing tasks)
+    moodle_url = models.URLField(blank=True, default="")
+
     # The date and time when the profile was created, automatically set when the profile is first created.
     created_at = models.DateTimeField(auto_now_add=True)
 

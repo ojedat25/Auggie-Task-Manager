@@ -11,6 +11,7 @@ export interface User {
 
 export interface UserProfile {
   user: User;
+  schoolYear: string;
   major: string;
   minor: string | null;
   bio: string | null;
