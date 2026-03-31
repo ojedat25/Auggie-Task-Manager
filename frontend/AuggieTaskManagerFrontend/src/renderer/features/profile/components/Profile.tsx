@@ -209,7 +209,7 @@ export const Profile: React.FC = () => {
                             >
                                 <option value="">Select a minor</option>
                                 <option value="CS">Computer Science</option>
-                                <option value="CpE">Computer Engineering</option>
+                                <option value="CE">Computer Engineering</option>
                                 <option value="EE">Electrical Engineering</option>
                                 <option value="ME">Mechanical Engineering</option>
                                 <option value="CE">Civil Engineering</option>
