@@ -10,9 +10,9 @@ import {
 } from 'react-router-dom';
 import { SESSION_EXPIRED_EVENT } from './api/axiosInstance';
 import { AuthService } from './features/auth/services/authService';
-import LoginLayout from './components/layout/LogInLayout';
-import DashboardLayout from './components/layout/DashboardLayout';
-import Homepage from './features/dashboard/components/Homepage';
+import { LoginLayout } from './components/layout/LogInLayout';
+import { DashboardLayout } from './components/layout/DashboardLayout';
+import { Homepage } from './features/dashboard/components/Homepage';
 
 export const ProtectedRoute = () => {
   if (!AuthService.isAuthenticated()) return <Navigate to="/login" replace />;

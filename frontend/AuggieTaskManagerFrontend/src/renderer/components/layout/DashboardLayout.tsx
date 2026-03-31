@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { NavBar } from '../common/NavBar';
 import { SideBar } from '../common/SideBar';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { AlertCard, AlertCardProps } from '../common/AlertCard';
+import { AlertCard } from '../common/AlertCard';
 
 import {
   Menu,
@@ -15,6 +15,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { Profile } from '../../features/profile/components/Profile';
+import { Homepage } from '../../features/dashboard/components/Homepage';
 export const DashboardLayout = () => {
   // Sidebar items to be used in the SideBar component
   const sideBarItems = [
@@ -50,7 +51,7 @@ export const DashboardLayout = () => {
       case 'Profile':
         return <Profile />;
       case 'Homepage':
-        return <div className = "p-4">Homepage content</div>
+        return <Homepage />;
       case 'Settings':
         return <div className = "p-4">Settings content</div>
       case 'Task List':
@@ -98,4 +99,4 @@ export const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+
