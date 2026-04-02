@@ -31,6 +31,24 @@ export function useTasks() {
     }
   }, []);
 
+  const updateTask = useCallback(async (task: Task) => {
+    try {
+      const updated = await TaskService.updateTask(task);
+      setTasks((tasks: Task[]) => tasks.map((currentTask: Task) => currentTask.id === task.id ? updated : currentTask));
+    } catch {
+      setErrorMessage('Error updating task');
+    }
+  }, []);
+
+  const deleteTask = useCallback(async (taskId: number) => {
+    try {
+      await TaskService.deleteTask(taskId);
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    } catch {
+      setErrorMessage('Error deleting task');
+    }
+  }, []);
+
   return {
     tasks,
     errorMessage,
@@ -39,5 +57,7 @@ export function useTasks() {
     hasMoodleUrl,
     handleImportMoodleTasks,
     fetchTasks,
+    updateTask,
+    deleteTask,
   };
 }
