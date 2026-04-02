@@ -81,7 +81,7 @@ def update_group_name(request, groupID):
 
     try:
         group = StudyGroup.objects.get(id=groupID)
-    except:
+    except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
 
     if group.created_by != request.user:
@@ -101,12 +101,48 @@ def update_members(request, groupID):
 
     try:
         group = StudyGroup.objects.get(id=groupID)
-    except:
+    except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
     
     if group.created_by != request.user:
         return Response({"error" : "Only the creator of the group can update the group members."}, status = status.HTTP_403_FORBIDDEN)
 
+    member_ids = request.data.get("members")
+    if member_ids is not None:
+        group.members.set(member_ids)
+        group.save()
+
+    return Response({"message": "Group members updated successfully."}, status = status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_private(request, groupID):
+    """
+    PATCH: updates the privacy setting of a study group. Only the creator of the group can update the privacy setting.
+    """
+    private = request.data.get("private")
+
+    try:
+        group = StudyGroup.objects.get(id=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    if group.created_by != request.user:
+        return Response({"error" : "Only the creator of the group can update the privacy setting."}, status = status.HTTP_403_FORBIDDEN)
+
+    private = request.data.get("private")
+    if private is  None:
+        return Response({"error": "No privacy setting provided."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if private not in [True, False]:
+        return Response({"error": "Invalid privacy setting. Must be true or false."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    group.private = private
+    group.save()
+
+    return Response({"message": "Group privacy updated successfully."}, status = status.HTTP_200_OK)
 
 
 @api_view(['POST'])
