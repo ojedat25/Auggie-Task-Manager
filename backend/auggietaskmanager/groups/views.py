@@ -145,6 +145,7 @@ def update_private(request, groupID):
     return Response({"message": "Group privacy updated successfully."}, status = status.HTTP_200_OK)
 
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def join_study_group(request, groupID):
