@@ -12,6 +12,9 @@ export const Tasks = () => {
     hasMoodleUrl,
     handleImportMoodleTasks,
     fetchTasks,
+    updateTask,
+    deleteTask,
+    completeTask,
   } = useTasks();
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export const Tasks = () => {
           </fieldset>
         </div>
       )}
-      <TaskList tasks={tasks} />
+      <TaskList tasks={tasks} completeTask={completeTask} deleteTask={deleteTask} />
     </div>
   );
 };
