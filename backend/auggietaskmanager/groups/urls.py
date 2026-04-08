@@ -1,0 +1,15 @@
+from django.urls import path
+
+from . import views
+
+app_name = "groups"
+
+urlpatterns = [
+    path("", views.StudyGroupListCreateView.as_view(), name="groups"),
+    path("join/", views.join_study_group, name="joinGroup"),
+    path("leave/", views.leave_study_group, name="leaveGroup"),
+    path("<int:groupID>/update_description/", views.update_description, name="updateDescription"),
+    path("<int:groupID>/update_group_name/", views.update_group_name, name="updateGroupName"),
+    path("<int:groupID>/update_members/", views.update_members, name="updateMembers"),
+    path("<int:groupID>/update_private/", views.update_private, name="updatePrivate"),
+]
