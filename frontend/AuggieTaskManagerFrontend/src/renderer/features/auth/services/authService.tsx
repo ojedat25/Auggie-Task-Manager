@@ -15,7 +15,7 @@ export class AuthService {
   // Fetch the currently logged-in user's profile from the backend
   static async getUserProfile(): Promise<UserProfile> {
     try {
-      const response = await axiosInstance.get(ENDPOINTS.AUTH_ME);
+      const response = await axiosInstance.get(ENDPOINTS.PROFILE_ME);
       return response.data;
     } catch (error: any) {
       // Return a readable error if the request fails
@@ -49,8 +49,15 @@ export class AuthService {
 
       // Store the authentication token for future requests
       this.saveToken(token);
-      // Also save user data for easy access
-      this.saveUser(user);
+      // Cache full user profile (includes moodle_url, etc.)
+      try {
+        const profile = await this.getUserProfile();
+        console.log('profile', profile);
+        this.saveUser(profile);
+      } catch {
+        // Fallback to minimal user payload from login response.
+        this.saveUser(user);
+      }
 
       return response.data;
     } catch (error: any) {
