@@ -6,6 +6,9 @@ export interface TaskFormModalProps {
   onClose: () => void;
   onSubmit: (values: TaskForm) => void | Promise<void>;
   submitting?: boolean;
+  title?: string;
+  descriptionText?: string;
+  initialValues?: TaskForm;
 }
 
 const emptyForm = (): TaskForm => ({
@@ -20,14 +23,16 @@ export const TaskFormModal = ({
   onClose,
   onSubmit,
   submitting = false,
+  title = 'New task',
+  descriptionText = 'Add a task to your list.',
+  initialValues,
 }: TaskFormModalProps) => {
   const [values, setValues] = useState<TaskForm>(emptyForm);
 
   useEffect(() => {
-    if (!open) {
-      setValues(emptyForm());
-    }
-  }, [open]);
+    if (!open) return;
+    setValues(initialValues ?? emptyForm());
+  }, [open, initialValues]);
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,9 +60,9 @@ export const TaskFormModal = ({
     >
       <div className="modal-box max-w-lg">
         <h2 id="task-form-title" className="font-bold text-lg">
-          New task
+          {title}
         </h2>
-        <p className="py-1 text-sm opacity-70">Add a task to your list.</p>
+        <p className="py-1 text-sm opacity-70">{descriptionText}</p>
 
         <form onSubmit={handleSubmit} className="fieldset gap-3">
           <fieldset className="fieldset">
@@ -139,7 +144,7 @@ export const TaskFormModal = ({
               {submitting ? (
                 <span className="loading loading-spinner loading-sm" />
               ) : (
-                'Add task'
+                'Save'
               )}
             </button>
           </div>

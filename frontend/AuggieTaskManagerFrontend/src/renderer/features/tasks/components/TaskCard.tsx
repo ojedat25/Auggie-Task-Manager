@@ -1,11 +1,12 @@
 // Task detail card
 import { Task } from '../../../types/task';
-import { TrashIcon, CheckIcon, X } from 'lucide-react';
+import { TrashIcon, CheckIcon, X, Pencil } from 'lucide-react';
 
 export interface TaskCardProps {
   task: Task;
   onComplete?: () => void;
   onUncomplete?: () => void;
+  onEdit?: () => void;
   onDelete?: () => void;
 }
 
@@ -25,12 +26,26 @@ export const TaskCard = ({
   task,
   onComplete,
   onUncomplete,
+  onEdit,
   onDelete,
 }: TaskCardProps) => {
   return (
     <div className="card card-border bg-base-200 w-full">
       <div className="card-body w-full">
-        <h2 className="card-title">{task.title}</h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="card-title">{task.title}</h2>
+          {task.source === 'manual' && (
+            <button
+              type="button"
+              className="btn btn-square btn-sm btn-ghost"
+              aria-label="Edit task"
+              title="Edit"
+              onClick={onEdit}
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+            </button>
+          )}
+        </div>
         <p>{task.description || 'No description.'}</p>
         {task.due_date != null && task.due_date !== '' && (
           <p>Due date: {formatDueDate(task.due_date)}</p>

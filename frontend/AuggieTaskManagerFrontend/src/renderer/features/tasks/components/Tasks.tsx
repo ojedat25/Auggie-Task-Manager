@@ -62,6 +62,7 @@ export const Tasks = () => {
         setIsAscending={setIsAscending}
         completeTask={completeTask}
         uncompleteTask={uncompleteTask}
+        updateTask={updateTask}
         deleteTask={deleteTask}
         createTask={createTask}
         onSyncMoodle={hasMoodleUrl ? handleSyncMoodleTasks : undefined}
