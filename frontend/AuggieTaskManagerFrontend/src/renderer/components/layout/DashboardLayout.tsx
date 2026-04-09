@@ -18,6 +18,7 @@ import {
 import { Tasks } from '../../features/tasks/components/Tasks';
 import { Profile } from '../../features/profile/components/Profile';
 import { Homepage } from '../../features/dashboard/components/Homepage';
+import { TaskCalendar } from '../../features/dashboard/components/TaskCalendar';
 export const DashboardLayout = () => {
   // Sidebar items to be used in the SideBar component
   const sideBarItems = [
@@ -64,6 +65,7 @@ export const DashboardLayout = () => {
         );
       case 'Task Calendar':
         return <div className="p-4">Task Calendar content</div>;
+        return <TaskCalendar />
       case 'Study Groups':
         return <div className="p-4">Study Groups content</div>;
       default:
