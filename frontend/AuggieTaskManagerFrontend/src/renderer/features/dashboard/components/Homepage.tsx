@@ -1,4 +1,5 @@
 import { useHomepage } from '../hooks/useHomepage';
+import { TaskCalendarWeekWidget } from './TaskCalendarWeekWidget';
 
 function formatDueDate(iso: string): string {
   const d = new Date(iso);
@@ -61,6 +62,15 @@ export const Homepage = () => {
               <div className="stat-desc">Next 7 days</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="card bg-base-100 shadow-md">
+        <div className="card-body space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold">Next 7 days</div>
+          </div>
+          <TaskCalendarWeekWidget />
         </div>
       </div>
 

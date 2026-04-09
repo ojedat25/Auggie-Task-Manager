@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useTaskCalendarRange } from '../hooks/useTaskCalendarRange';
-import { addDays, formatYmd, startOfDay } from '../utils/calendarDate';
+import { addDays, startOfDay } from '../utils/calendarDate';
 import { taskBadgeClasses } from '../utils/calendarTask';
 
 export const TaskCalendarWeekWidget = () => {
@@ -87,4 +87,5 @@ export const TaskCalendarWeekWidget = () => {
     </div>
   );
 };
+
 

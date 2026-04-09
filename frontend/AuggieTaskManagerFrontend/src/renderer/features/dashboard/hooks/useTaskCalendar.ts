@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { TaskService, type ApiTask } from '../../tasks/services/taskService';
+import type { ApiTask } from '../../tasks/services/taskService';
+
+import { TaskCalendarService } from '../services/taskCalendarService';
 
 import {
   addDays,
@@ -55,7 +57,7 @@ export function useTaskCalendar() {
         // Query range: inclusive start..end, so end is end-of-day.
         const startIso = gridStart.toISOString();
         const endIso = addDays(gridEnd, 1).toISOString();
-        const data = await TaskService.getCalendarTasks({
+        const data = await TaskCalendarService.getRange({
           start: startIso,
           end: endIso,
         });
