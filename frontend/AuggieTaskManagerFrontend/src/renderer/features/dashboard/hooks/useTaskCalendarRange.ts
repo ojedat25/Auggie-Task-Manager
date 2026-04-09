@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import type { ApiTask } from '../../tasks/services/taskService';
-
-import { TaskCalendarService } from '../services/taskCalendarService';
+import { TaskService, type ApiTask } from '../../tasks/services/taskService';
 
 import { addDays, formatYmd, startOfDay } from '../utils/calendarDate';
 import { parseTaskDayKey } from '../utils/calendarTask';
@@ -63,7 +61,7 @@ export function useTaskCalendarRange(params: {
       try {
         const startIso = rangeStart.toISOString();
         const endIso = addDays(rangeEnd, 1).toISOString();
-        const data = await TaskCalendarService.getRange({ start: startIso, end: endIso });
+        const data = await TaskService.getCalendarTasks({ start: startIso, end: endIso });
         if (!cancelled) setTasks(data);
       } catch {
         if (!cancelled) setError('Failed to load tasks for the week.');
