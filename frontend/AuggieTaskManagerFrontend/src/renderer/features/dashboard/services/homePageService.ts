@@ -153,11 +153,7 @@ export class HomePageService {
       return getMockUpcomingTasks();
     }
 
-    // Current backend exposes /moodle/tasks/ + custom /filter. No dedicated upcoming endpoint yet.
-    // We do a lightweight strategy:
-    // - Prefer filter endpoint if present
-    // - Otherwise fetch tasks and reduce client-side.
-    const limit = params?.limit ?? 5;
+    const limit = params?.limit;
     const days = params?.days ?? 7;
     const now = new Date();
     const end = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
@@ -173,7 +169,8 @@ export class HomePageService {
         ? filterRes.data
         : filterRes.data?.results;
       const items = Array.isArray(data) ? data : [];
-      return items.map(toUpcomingTask).slice(0, limit);
+      const mapped = items.map(toUpcomingTask);
+      return typeof limit === 'number' ? mapped.slice(0, limit) : mapped;
     } catch {
       // fall through
     }
@@ -182,13 +179,14 @@ export class HomePageService {
     const data = Array.isArray(res.data) ? res.data : res.data?.results;
     const items: Task[] = Array.isArray(data) ? (data as Task[]) : [];
 
-    return items
+    const upcoming = items
       .map(toUpcomingTask)
       .filter((t) => {
         const due = new Date(t.dueAt);
         return !Number.isNaN(due.getTime()) && due >= now && due <= end;
       })
-      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
-      .slice(0, limit);
+      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime());
+
+    return typeof limit === 'number' ? upcoming.slice(0, limit) : upcoming;
   }
 }

@@ -15,7 +15,7 @@ export function CalendarDayCell(props: {
   return (
     <div
       className={
-        'min-h-28 bg-base-100 p-2 ' +
+        'min-h-28 overflow-hidden bg-base-100 p-2 ' +
         (dim ? 'opacity-60 ' : '') +
         (isToday ? 'ring-2 ring-primary ring-inset ' : '')
       }
@@ -27,11 +27,15 @@ export function CalendarDayCell(props: {
 
       <div className="flex flex-col gap-1">
         {dayTasks.slice(0, 4).map((t) => (
-          <div key={String(t.id)} className="flex items-center gap-2">
+          <div key={String(t.id)} className="flex min-w-0 items-center gap-2">
             <span className={taskBadgeClasses(t)}>
               {t.source === 'moodle' ? 'M' : 'U'}
             </span>
-            <div className={t.completed ? 'line-through opacity-70' : ''}>
+            <div
+              className={
+                'min-w-0 ' + (t.completed ? 'line-through opacity-70' : '')
+              }
+            >
               <div className="truncate text-sm" title={t.title}>
                 {t.title}
               </div>
