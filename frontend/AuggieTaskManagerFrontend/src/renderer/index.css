@@ -29,6 +29,17 @@
   --color-accent-content: #ffffff;
 }
 
+/* Manual dark mode: style dropdown only */
+:root[data-theme="dark"] .select {
+  background-color: #130101;
+  border-color: #333333;
+  color: #ffffff;
+}
+:root[data-theme="dark"] .select option {
+  background-color: #130101;
+  color: #ffffff;
+}
+
 /* Auggie dark theme: #420303 as main background */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
