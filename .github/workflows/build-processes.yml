@@ -40,11 +40,11 @@ jobs:
                     exit 0
                   fi
 
-                  git config user.name "github-actions[bot]"
+                  git config user.name "github-actions"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
                   git add -A
-                  git commit -m "chore(ci): apply ruff fixes"
+                  git commit -m "Github Actions: applying automated Ruff fixes"
                   git push origin "HEAD:${{ github.head_ref }}"
             - name: Ensure clean after Ruff
               run: git diff --exit-code
@@ -88,11 +88,11 @@ jobs:
                     exit 0
                   fi
 
-                  git config user.name "github-actions[bot]"
+                  git config user.name "github-actions"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
                   git add -A
-                  git commit -m "chore(ci): apply prettier formatting"
+                  git commit -m "Github Actions: applying automated Prettier fixes"
                   git push origin "HEAD:${{ github.head_ref }}"
             - name: Ensure clean after Prettier
               run: git diff --exit-code
