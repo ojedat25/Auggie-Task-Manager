@@ -15,8 +15,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Upsert PR comment
+              if: ${{ vars.CI_COMMENT_TOKEN != '' }}
               uses: actions/github-script@v7
               with:
+                  github-token: ${{ vars.CI_COMMENT_TOKEN }}
                   script: |
                       const marker = "<!-- auggie-ci-status -->";
                       const owner = context.repo.owner;
@@ -85,3 +87,6 @@ jobs:
                           });
                         }
                       }
+            - name: Skip PR comment (no token)
+              if: ${{ vars.CI_COMMENT_TOKEN == '' }}
+              run: echo "CI_COMMENT_TOKEN not set (repo variable); skipping PR comment."
