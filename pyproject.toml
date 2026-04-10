@@ -25,7 +25,11 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"**/migrations/*.py" = ["E501"]
+"**/migrations/*.py" = [
+    "E501", # Django migrations often contain long generated lines
+    "I001", # Don't enforce import sorting in generated migrations
+    "W292", # Don't fail CI on missing trailing newline in generated migrations
+]
 
 [tool.ruff.lint.isort]
 # Ensures your Django imports are grouped correctly

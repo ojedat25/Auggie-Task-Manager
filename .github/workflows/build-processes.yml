@@ -26,6 +26,7 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install ruff
             - name: Fix lint + format (Ruff)
+              continue-on-error: true
               run: |
                   ruff check --fix
                   ruff format
@@ -47,6 +48,8 @@ jobs:
                   git push origin "HEAD:${{ github.head_ref }}"
             - name: Ensure clean after Ruff
               run: git diff --exit-code
+            - name: Ruff check (strict)
+              run: ruff check
 
     lint-frontend:
         runs-on: ubuntu-latest
