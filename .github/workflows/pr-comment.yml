@@ -57,7 +57,7 @@ jobs:
                           "- Inline annotations in “Files changed” show lint locations.",
                           "",
                           "_This comment is updated automatically._",
-                        ].join("\\n");
+                        ].join("\n");
 
                         const { data: comments } = await github.rest.issues.listComments({
                           owner,
