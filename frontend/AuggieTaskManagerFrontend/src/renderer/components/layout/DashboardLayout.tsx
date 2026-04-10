@@ -4,6 +4,7 @@ import { SideBar } from '../common/SideBar';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { AlertCard } from '../common/AlertCard';
+import { SettingsScreen } from '../../features/dashboard/components/Settings';
 
 import {
   Menu,
@@ -54,7 +55,7 @@ export const DashboardLayout = () => {
       case 'Homepage':
         return <Homepage />;
       case 'Settings':
-        return <div className = "p-4">Settings content</div>
+        return <SettingsScreen/>;
       case 'Task List':
         return <div className = "p-4"><Tasks /></div>
       case 'Task Calendar':
@@ -100,4 +101,4 @@ export const DashboardLayout = () => {
   );
 };
 
-
+export default DashboardLayout;
