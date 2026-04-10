@@ -26,14 +26,6 @@ jobs:
                       const run = context.payload.workflow_run;
                       const runUrl = run.html_url;
                       const conclusion = run.conclusion ?? "unknown";
-                      const statusLabel =
-                        conclusion === "success" ? "SUCCESS" :
-                        conclusion === "failure" ? "FAILURE" :
-                        conclusion === "cancelled" ? "CANCELLED" :
-                        conclusion === "skipped" ? "SKIPPED" :
-                        conclusion === "neutral" ? "NEUTRAL" :
-                        conclusion === "timed_out" ? "TIMED_OUT" :
-                        "UNKNOWN";
 
                       // workflow_run can relate to multiple PRs (rare). We'll comment on all.
                       const prs = run.pull_requests ?? [];
@@ -49,12 +41,12 @@ jobs:
                           marker,
                           "### CI status",
                           "",
-                          `**Build and Test**: ${statusLabel} \`${conclusion}\``,
+                          `**Build and Test**: \`${conclusion}\``,
                           `**Run**: ${runUrl}`,
                           "",
-                          "Notes:",
+                          "Warnings:",
                           "- Formatting fixes (Ruff/Prettier) may be auto-pushed to the PR branch.",
-                          "- Inline annotations in “Files changed” show lint locations.",
+                          "- There might still be some linting errors annotated in “Files changed”.",
                           "",
                           "_This comment is updated automatically._",
                         ].join("\n");
