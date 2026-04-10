@@ -73,11 +73,11 @@ body {
   outline-offset: 2px;
 }
 
-/* Dark mode: fieldset and inputs #130101 */
+/* Dark mode: fieldsets use theme surfaces (no extra maroon panel on .fieldset) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) .fieldset {
-    background-color: #130101;
-    border-color: #1a1a1a;
+    background-color: transparent;
+    border-color: transparent;
   }
   :root:not([data-theme]) .input,
   :root:not([data-theme]) .select {

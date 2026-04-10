@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import Task
+
 
 # Serializer for Task model
 class TaskSerializer(serializers.ModelSerializer):
@@ -9,7 +11,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         # The TaskSerializer converts Task model instances to JSON format and vice versa.
         model = Task
-        fields = ['id', 'title', 'description', 'due_date', 'course',
+        fields = ['id', 'title', 'description', 'due_date', 'course', 'semester',
                   'source', 'is_imported', 'completed', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 

@@ -1,11 +1,14 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.utils import timezone
-from datetime import timedelta, datetime
-from unittest.mock import patch, MagicMock
+from datetime import datetime, timedelta
+from unittest.mock import patch
+
 import pytz
 from moodle.models import Task
 from moodle.serializers import TaskSerializer
+from tests.calendar_fixtures import make_course
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils import timezone
 
 
 class CalendarViewSerializerUnitTests(TestCase):
@@ -36,7 +39,7 @@ class CalendarViewSerializerUnitTests(TestCase):
             description='Imported from Moodle',
             due_date=now + timedelta(days=10),
             source='moodle',
-            course='CSC 101',
+            course=make_course('CSC101'),
             completed=False
         )
 
@@ -57,7 +60,7 @@ class CalendarViewSerializerUnitTests(TestCase):
         # THEN: is_imported field is True
         self.assertTrue(data['is_imported'])
         self.assertEqual(data['source'], 'moodle')
-        self.assertEqual(data['course'], 'CSC 101')
+        self.assertEqual(data['course'], 'CSC101')
 
     def test_serializer_is_imported_field_for_manual_task(self):
         """
@@ -89,7 +92,7 @@ class CalendarViewSerializerUnitTests(TestCase):
         data = serializer.data
 
         # THEN: All required fields are present
-        required_fields = ['id', 'title', 'description', 'due_date', 'course',
+        required_fields = ['id', 'title', 'description', 'due_date', 'course', 'semester',
                           'source', 'is_imported', 'completed', 'created_at', 'updated_at']
         for field in required_fields:
             self.assertIn(field, data)
@@ -150,13 +153,13 @@ class CalendarViewModelUnitTests(TestCase):
             description='Complete homework',
             due_date=now + timedelta(days=7),
             source='moodle',
-            course='CSC 101',
+            course=make_course('CSC101'),
             completed=False
         )
 
         # THEN: Task is created with correct fields
         self.assertEqual(task.source, 'moodle')
-        self.assertEqual(task.course, 'CSC 101')
+        self.assertEqual(task.course.courseID, 'CSC101')
         self.assertFalse(task.completed)
         self.assertIsNotNone(task.created_at)
         self.assertIsNotNone(task.updated_at)
@@ -182,7 +185,7 @@ class CalendarViewModelUnitTests(TestCase):
 
         # THEN: Task is created with correct source
         self.assertEqual(task.source, 'manual')
-        self.assertEqual(task.course, '')  # Empty for manual tasks
+        self.assertIsNone(task.course)
 
     def test_task_default_source_is_moodle(self):
         """
@@ -222,7 +225,7 @@ class CalendarViewModelUnitTests(TestCase):
             title='Task 2',
             due_date=now + timedelta(days=5),
             source='moodle',
-            course='CSC 101'
+            course=make_course('CSC101')
         )
         task3 = Task.objects.create(
             user=self.user,
@@ -292,7 +295,7 @@ class CalendarViewQuerysetUnitTests(TestCase):
             title='User1 Moodle Task',
             due_date=now + timedelta(days=10),
             source='moodle',
-            course='CSC 101'
+            course=make_course('CSC101')
         )
 
         # Create tasks for user2
@@ -301,7 +304,7 @@ class CalendarViewQuerysetUnitTests(TestCase):
             title='User2 Task',
             due_date=now + timedelta(days=5),
             source='moodle',
-            course='MATH 201'
+            course=make_course('MATH201')
         )
 
     # ==================== HAPPY PATHS ====================
@@ -370,7 +373,7 @@ class CalendarViewQuerysetUnitTests(TestCase):
         self.assertEqual(user1_moodle_tasks.count(), 1)
         task = user1_moodle_tasks.first()
         self.assertEqual(task.title, 'User1 Moodle Task')
-        self.assertEqual(task.course, 'CSC 101')
+        self.assertEqual(task.course.courseID, 'CSC101')
 
 
 

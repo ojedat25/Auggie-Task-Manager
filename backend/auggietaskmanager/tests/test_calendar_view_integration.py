@@ -1,9 +1,12 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.utils import timezone
 from datetime import timedelta
+
 from moodle.models import Task
 from moodle.serializers import TaskSerializer
+from tests.calendar_fixtures import make_course
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils import timezone
 
 
 class CalendarViewMoodleImportIntegrationTests(TestCase):
@@ -22,13 +25,14 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
         # Simulate imported Moodle tasks
         self.moodle_tasks = []
         for i in range(3):
+            cid = f'CSC{100 + i}'
             task = Task.objects.create(
                 user=self.user,
                 title=f'CSC {100+i}: Assignment {i+1}',
                 description=f'Complete assignment {i+1}',
                 due_date=now + timedelta(days=(i+1)*3),
                 source='moodle',
-                course=f'CSC {100+i}',
+                course=make_course(cid),
                 completed=False
             )
             self.moodle_tasks.append(task)
@@ -88,15 +92,20 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
         """
         # GIVEN: Moodle tasks from different courses
         now = timezone.now()
-        courses = ['MATH 301', 'PHYS 201', 'ENG 101', 'HIST 150']
+        course_specs = [
+            ('MATH301', 'MATH 301'),
+            ('PHYS201', 'PHYS 201'),
+            ('ENG101', 'ENG 101'),
+            ('HIST150', 'HIST 150'),
+        ]
 
-        for i, course in enumerate(courses):
+        for i, (cid, label) in enumerate(course_specs):
             Task.objects.create(
                 user=self.user,
-                title=f'{course}: Homework',
+                title=f'{label}: Homework',
                 due_date=now + timedelta(days=i+10),
                 source='moodle',
-                course=course,
+                course=make_course(cid, name=label),
                 completed=False
             )
 
@@ -109,12 +118,15 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
         courses_in_data = {t['course'] for t in data}
         self.assertEqual(len(courses_in_data), 7)  # 3 from setUp + 4 new
 
+        expected_ids = {
+            'CSC100', 'CSC101', 'CSC102',
+            'MATH301', 'PHYS201', 'ENG101', 'HIST150',
+        }
         # AND: Each task has proper identification
         for task in data:
             self.assertTrue(task['is_imported'])
             self.assertEqual(task['source'], 'moodle')
-            self.assertIn(task['course'], ['CSC 100', 'CSC 101', 'CSC 102',
-                                           'MATH 301', 'PHYS 201', 'ENG 101', 'HIST 150'])
+            self.assertIn(task['course'], expected_ids)
 
     def test_end_of_semester_with_many_moodle_deadlines(self):
         """
@@ -133,7 +145,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
                 title=f'Final Assignment {i+1}',
                 due_date=base_date + timedelta(hours=i*6),
                 source='moodle',
-                course=f'COURSE{i % 5}',  # 5 different courses
+                course=make_course(f'COURSE{i % 5}'),
                 completed=False
             )
 
@@ -173,7 +185,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
             title='Completed Moodle Task',
             due_date=now - timedelta(days=5),
             source='moodle',
-            course='OLD 101',
+            course=make_course('OLD101'),
             completed=True
         )
 
@@ -209,7 +221,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
             title='User2 Moodle Task',
             due_date=now + timedelta(days=5),
             source='moodle',
-            course='PRIVATE 101',
+            course=make_course('PRIVATE101'),
             completed=False
         )
 
@@ -250,7 +262,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
             description=long_description,
             due_date=now + timedelta(days=30),
             source='moodle',
-            course='CSC 301',
+            course=make_course('CSC301'),
             completed=False
         )
 
@@ -278,7 +290,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
             title='Past Moodle Task',
             due_date=now - timedelta(days=30),
             source='moodle',
-            course='OLD 100',
+            course=make_course('OLD100'),
             completed=True
         )
 
@@ -288,7 +300,7 @@ class CalendarViewMoodleImportIntegrationTests(TestCase):
             title='Far Future Moodle Task',
             due_date=now + timedelta(days=365),
             source='moodle',
-            course='FUTURE 500',
+            course=make_course('FUTURE500'),
             completed=False
         )
 

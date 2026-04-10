@@ -1,13 +1,14 @@
 # This file contains integration tests for the extract_calendar_data function in moodle.utils.
 
 from datetime import datetime, timedelta
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytz
 from icalendar import Calendar, Event
-
+from moodle.models import Course
 from moodle.utils import extract_calendar_data
+
+from django.test import TestCase
 
 
 class TestExtractCalendarDataIntegration(TestCase):
@@ -69,7 +70,7 @@ class TestExtractCalendarDataIntegration(TestCase):
             self.assertIn(":", event["title"])  # Course code included
             self.assertIsNotNone(event["description"])
             self.assertIsNotNone(event["due_date"])
-            courses_found.add(event["course"][:3])  # First 3 chars of course code
+            courses_found.add(str(event["course"].courseID)[:3])  # First 3 chars of course code
 
         self.assertGreaterEqual(len(courses_found), 3)
 
@@ -130,7 +131,7 @@ class TestExtractCalendarDataIntegration(TestCase):
             (pytz.timezone("US/Pacific"), "Pacific Event", "2026-03-15T12:00:00"),
         ]
 
-        for tz, title, time_str in timezones:
+        for tz, title, _time_str in timezones:
             event = Event()
             event.add("summary", title)
             event.add("description", f"Event in {tz}")
@@ -360,7 +361,7 @@ class TestExtractCalendarDataIntegration(TestCase):
         result = extract_calendar_data(self.calendar_url)
 
         # All output events should have consistent structure
-        required_keys = {"external_id", "title", "description", "due_date", "course"}
+        required_keys = {"external_id", "title", "description", "due_date", "course", "semester"}
         for event_result in result:
             self.assertEqual(set(event_result.keys()), required_keys)
             # Check types
@@ -368,7 +369,8 @@ class TestExtractCalendarDataIntegration(TestCase):
             self.assertIsInstance(event_result["title"], str)
             self.assertIsInstance(event_result["description"], str)
             self.assertIsInstance(event_result["due_date"], str)
-            self.assertIsInstance(event_result["course"], str)
+            self.assertIsInstance(event_result["course"], Course)
+            self.assertIsInstance(event_result["semester"], str)
 
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_end_of_semester_crunch(self, mock_get):
@@ -434,7 +436,7 @@ class TestExtractCalendarDataIntegration(TestCase):
         for idx, date in enumerate(dates):
             event = Event()
             event.add("summary", f"Boundary Event {idx+1}")
-            event.add("description", f"Event on boundary")
+            event.add("description", "Event on boundary")
             event.add("categories", "MULTI")
             event.add("dtend", date)
             cal.add_component(event)

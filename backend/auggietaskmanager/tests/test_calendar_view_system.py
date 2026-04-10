@@ -1,10 +1,13 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.utils import timezone
-from rest_framework.test import APIClient
-from rest_framework import status
 from datetime import timedelta
+
 from moodle.models import Task
+from rest_framework import status
+from rest_framework.test import APIClient
+from tests.calendar_fixtures import make_course
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils import timezone
 
 
 class CalendarViewEndpointSystemTests(TestCase):
@@ -37,7 +40,7 @@ class CalendarViewEndpointSystemTests(TestCase):
             description='Imported from Moodle',
             due_date=now + timedelta(days=10),
             source='moodle',
-            course='CSC 101'
+            course=make_course('CSC101')
         )
 
     # ==================== HAPPY PATHS ====================
@@ -56,7 +59,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar view
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -71,7 +74,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         moodle_task = moodle_tasks[0]
         self.assertTrue(moodle_task['is_imported'])
         self.assertEqual(moodle_task['source'], 'moodle')
-        self.assertEqual(moodle_task['course'], 'CSC 101')
+        self.assertEqual(moodle_task['course'], 'CSC101')
 
         # AND: Manual tasks are distinguishable
         manual_tasks = [t for t in response.data if t['source'] == 'manual']
@@ -98,14 +101,14 @@ class CalendarViewEndpointSystemTests(TestCase):
             title='Far Future Task',
             due_date=now + timedelta(days=100),
             source='moodle',
-            course='FUTURE 101'
+            course=make_course('FUTURE101')
         )
 
         # WHEN: User requests calendar for next 30 days
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -126,7 +129,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         # GIVEN: User with tasks
 
         # WHEN: User requests calendar without date parameters
-        response = self.client.get('/moodle/tasks/calendar/')
+        response = self.client.get('/tasks/calendar/')
 
         # THEN: All user tasks are returned
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -144,7 +147,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         unauthenticated_client = APIClient()
 
         # WHEN: Unauthenticated request is made
-        response = unauthenticated_client.get('/moodle/tasks/calendar/')
+        response = unauthenticated_client.get('/tasks/calendar/')
 
         # THEN: Request is rejected
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
@@ -159,7 +162,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides invalid date format
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': 'invalid-date', 'end': 'also-invalid'}
         )
 
@@ -178,7 +181,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides malformed start date
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': 'not-a-date', 'end': (now + timedelta(days=30)).isoformat()}
         )
 
@@ -197,7 +200,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User provides malformed end date
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': now.isoformat(), 'end': 'not-a-date'}
         )
 
@@ -218,7 +221,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar for empty range
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -241,14 +244,14 @@ class CalendarViewEndpointSystemTests(TestCase):
             title='Other User Task',
             due_date=now + timedelta(days=5),
             source='moodle',
-            course='PRIVATE 101'
+            course=make_course('PRIVATE101')
         )
 
         # WHEN: First user requests calendar
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -270,7 +273,7 @@ class CalendarViewEndpointSystemTests(TestCase):
 
         # WHEN: User requests calendar
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -278,7 +281,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response.data), 0)
 
-        required_fields = ['id', 'title', 'description', 'due_date', 'course',
+        required_fields = ['id', 'title', 'description', 'due_date', 'course', 'semester',
                           'source', 'is_imported', 'completed', 'created_at', 'updated_at']
 
         for task in response.data:
@@ -293,22 +296,22 @@ class CalendarViewEndpointSystemTests(TestCase):
         """
         # GIVEN: Multiple Moodle courses
         now = timezone.now()
-        courses = ['MATH 301', 'PHYS 201', 'ENG 101']
+        course_specs = [('MATH301', 'MATH 301'), ('PHYS201', 'PHYS 201'), ('ENG101', 'ENG 101')]
 
-        for i, course in enumerate(courses):
+        for i, (cid, label) in enumerate(course_specs):
             Task.objects.create(
                 user=self.user,
-                title=f'{course}: Assignment',
+                title=f'{label}: Assignment',
                 due_date=now + timedelta(days=i+3),
                 source='moodle',
-                course=course
+                course=make_course(cid, name=label)
             )
 
         # WHEN: User requests calendar
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 
@@ -336,7 +339,7 @@ class CalendarViewEndpointSystemTests(TestCase):
             title='Completed Task',
             due_date=now + timedelta(days=2),
             source='moodle',
-            course='DONE 101',
+            course=make_course('DONE101'),
             completed=True
         )
 
@@ -344,7 +347,7 @@ class CalendarViewEndpointSystemTests(TestCase):
         start = now.isoformat()
         end = (now + timedelta(days=30)).isoformat()
         response = self.client.get(
-            '/moodle/tasks/calendar/',
+            '/tasks/calendar/',
             {'start': start, 'end': end}
         )
 

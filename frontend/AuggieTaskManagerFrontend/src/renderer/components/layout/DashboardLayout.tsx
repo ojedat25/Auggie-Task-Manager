@@ -15,6 +15,7 @@ import {
   UsersRound,
   LogOut,
 } from 'lucide-react';
+import { Tasks } from '../../features/tasks/components/Tasks';
 import { Profile } from '../../features/profile/components/Profile';
 import { Homepage } from '../../features/dashboard/components/Homepage';
 export const DashboardLayout = () => {
@@ -56,7 +57,7 @@ export const DashboardLayout = () => {
       case 'Settings':
         return <SettingsScreen/>;
       case 'Task List':
-        return <div className = "p-4">Task List content</div>
+        return <div className = "p-4"><Tasks /></div>
       case 'Task Calendar':
         return <div className = "p-4">Task Calendar content</div>
       case 'Study Groups':

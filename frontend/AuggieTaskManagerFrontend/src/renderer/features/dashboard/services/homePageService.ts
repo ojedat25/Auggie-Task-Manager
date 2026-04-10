@@ -159,7 +159,7 @@ export class HomePageService {
     const end = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 
     try {
-      const filterRes = await axiosInstance.get('/moodle/tasks/filter', {
+      const filterRes = await axiosInstance.get('/tasks/filter', {
         params: {
           start: now.toISOString(),
           end: end.toISOString(),
@@ -174,7 +174,7 @@ export class HomePageService {
       // fall through
     }
 
-    const res = await axiosInstance.get('/moodle/tasks/');
+    const res = await axiosInstance.get('/tasks/');
     const data = Array.isArray(res.data) ? res.data : res.data?.results;
     const items: Task[] = Array.isArray(data) ? (data as Task[]) : [];
 

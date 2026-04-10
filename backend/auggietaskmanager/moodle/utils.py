@@ -1,10 +1,42 @@
 # Put all helper functions here
+from urllib.parse import urlparse
+
+import pytz
 import requests
 from icalendar import Calendar
-import pytz
-from .errors import *
-from .models import Task
-from urllib.parse import urlparse
+
+from .errors import (
+    MoodleCalendarInaccessibleError,
+    MoodleCalendarInvalidUrlError,
+    MoodleCalendarParseError,
+)
+from .models import Course, Task
+
+
+def get_semester(category: str) -> str:
+    """Map the year/semester segment of a Moodle category to Spring or Fall.
+
+    e.g. ``CSC443_2025SEM2-A`` → segment ``2025SEM2`` → ``Spring``.
+    If there is no ``_`` (no semester segment), returns ``""``.
+    """
+    parts = category.strip().split("_")
+    if len(parts) < 2:
+        return ""
+    sem_part = parts[1].split("-")[0]
+    upper = sem_part.upper()
+    if "SEM2" in upper:
+        return "Spring"
+    return "Fall"
+
+
+def _course_id_from_moodle_category(raw: str) -> str:
+    """First segment before ``_`` (e.g. ``CSC443`` from ``CSC443_2025SEM2-A``), capped at model max length."""
+    max_len = Course._meta.get_field("courseID").max_length
+    s = raw.strip()
+    if not s:
+        return ""
+    course_id = s.split("_", 1)[0]
+    return course_id[:max_len]
 
 
 def validate_moodle_calendar_url(calendar_url: str) -> None:
@@ -13,8 +45,11 @@ def validate_moodle_calendar_url(calendar_url: str) -> None:
     This helps catch common user errors (e.g., missing URL, pasting an HTML page instead of the .ics link)
     and provides more specific error messages without relying on request exceptions or HTTP status codes.
 
-    Args:        calendar_url (str): The Moodle calendar URL to validate.
-    Raises:        MoodleCalendarInvalidUrlError: If the URL is missing, not a string, or doesn't look like a valid HTTP/HTTPS URL.
+    Args:
+        calendar_url (str): The Moodle calendar URL to validate.
+    Raises:
+        MoodleCalendarInvalidUrlError: If the URL is missing, not a string, or doesn't look
+        like a valid HTTP/HTTPS URL.
     """
     if not calendar_url or not isinstance(calendar_url, str):
         raise MoodleCalendarInvalidUrlError(
@@ -64,7 +99,8 @@ def _map_http_status(status_code: int) -> MoodleCalendarInaccessibleError:
     Args:
         status_code (int): The HTTP status code returned from the calendar URL request.
     Returns:
-        MoodleCalendarInaccessibleError: A more specific error with a user-friendly message and error code based on the status code.
+        MoodleCalendarInaccessibleError: A more specific error with a user-friendly message and
+        error code based on the status code.
     """
     if status_code in {401, 403}:
         return MoodleCalendarInaccessibleError(
@@ -130,6 +166,13 @@ def extract_calendar_data(calendar_url):
 
     calendar_events = []
     for calendar_event in calendar.walk("vevent"):
+        raw_course_id = str(
+            calendar_event.get("categories").cats[0].to_ical().decode("utf-8")
+        )
+
+        semester = get_semester(raw_course_id)
+        course_id = _course_id_from_moodle_category(raw_course_id)
+        course, _ = Course.objects.get_or_create(courseID=course_id)
         calendar_events.append(
             {
                 "external_id": str(calendar_event.get("uid")),
@@ -138,7 +181,8 @@ def extract_calendar_data(calendar_url):
                 "due_date": calendar_event.get("dtend")
                 .dt.astimezone(central_tz)
                 .isoformat(),  # Convert to Central Time
-                "course": str(calendar_event.get("categories").cats[0].to_ical().decode("utf-8"))[:15],
+                "course": course,
+                "semester": semester,
             }
         )
 
@@ -151,6 +195,9 @@ def add_moodle_tasks(calendar_events, user):
     Args:
         calendar_events (List[Dict]): list of calendar events
     """
+    if not calendar_events:
+        return []
+
     # Add the tasks to the database in bulk
     created_tasks = Task.objects.bulk_create(
         [
@@ -161,6 +208,7 @@ def add_moodle_tasks(calendar_events, user):
                 description=calendar_event["description"],
                 due_date=calendar_event["due_date"],
                 course=calendar_event["course"],
+                semester=calendar_event.get("semester", ""),
                 source="moodle",
             )
             for calendar_event in calendar_events
@@ -177,7 +225,36 @@ def get_user_moodle_tasks(user_id):
     Returns:
         List[Task]: list of moodle tasks
     """
+
     return Task.objects.filter(user_id=user_id, source="moodle")
+
+
+def sync_moodle_tasks(moodle_url, user):
+    """Fetch Moodle calendar data and create tasks only for events not already stored.
+
+    Args:
+        moodle_url (str): Moodle iCalendar export URL.
+        user: Django User instance owning the tasks.
+
+    Returns:
+        QuerySet of all Task rows for this user (manual and Moodle), after sync.
+    """
+    calendar_events = extract_calendar_data(moodle_url)
+
+    if not calendar_events:
+        return Task.objects.filter(user=user)
+
+    external_ids = [event["external_id"] for event in calendar_events]
+    existing_ids = set(
+        Task.objects.filter(
+            user=user,
+            source="moodle",
+            external_id__in=external_ids,
+        ).values_list("external_id", flat=True)
+    )
+    new_events = [event for event in calendar_events if event["external_id"] not in existing_ids]
+    add_moodle_tasks(new_events, user)
+    return Task.objects.filter(user=user)
 
 
 def get_user_tasks(user_id):

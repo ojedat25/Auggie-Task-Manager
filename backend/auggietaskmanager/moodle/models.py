@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # This model represents a course in Moodle that can be associated with tasks and study groups.
 class Course(models.Model):
     # The unique identifier for the course, represented as a string (e.g., "CSC101"). This field serves as the primary key for the model.
-    courseID = models.CharField(max_length=10, primary_key=True)
+    courseID = models.CharField(max_length=20, primary_key=True)
 
     # Name of the course, such as "Introduction to Computer Science". This field is required and has a maximum length of 200 characters.
     name = models.CharField(max_length=200)
@@ -18,6 +18,11 @@ class Course(models.Model):
 
 
 class Task(models.Model):
+
+    SEMESTERS = [
+        ("Spring", "Spring"),
+        ("Fall", "Fall"),
+    ]
     # Which user owns this task
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -39,7 +44,8 @@ class Task(models.Model):
     )
 
     # Automatically records when the task was created in the database
-    course = models.CharField(max_length=200, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=True, null=True)
+    semester = models.CharField(max_length=200, blank=True, choices=SEMESTERS)
     external_id = models.CharField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

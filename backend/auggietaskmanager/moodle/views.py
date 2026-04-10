@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from moodle.errors import *
 from moodle.models import Task
 from moodle.serializers import TaskSerializer
-from moodle.utils import add_moodle_tasks, extract_calendar_data
+from moodle.utils import sync_moodle_tasks
 
 
 @api_view(["GET"])
@@ -52,7 +52,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'], url_path='import_moodle_calendar')
-    def import_moodle_calendar(self, request):
+    def fetch_moodle_calendar(self, request):
         """Import calendar events from Moodle and create tasks."""
         user_profile = request.user.userprofile
         moodle_url = request.data.get('moodle_url')
@@ -72,13 +72,15 @@ class TaskViewSet(viewsets.ModelViewSet):
             user_profile.save(update_fields=['moodle_url'])
 
         try:
-            calendar_data = extract_calendar_data(moodle_url)
-            tasks = add_moodle_tasks(calendar_data, request.user)
+            tasks = sync_moodle_tasks(moodle_url, request.user)
 
             serializer = self.get_serializer(tasks, many=True)
             return Response(
-                {'message': f'Successfully imported {len(tasks)} tasks.', 'tasks': serializer.data},
-                status=status.HTTP_201_CREATED
+                {
+                    'message': 'Calendar synced successfully.',
+                    'tasks': serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
             )
 
         except MoodleCalendarInvalidUrlError as e:

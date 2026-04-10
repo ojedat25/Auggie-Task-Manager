@@ -1,19 +1,22 @@
 # This file contains unit tests for the extract_calendar_data function in moodle.utils.
 
 from datetime import datetime
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytz
 import requests
 from icalendar import Calendar, Event
-
+from moodle.models import Course
 from moodle.utils import (
-    extract_calendar_data,
     MoodleCalendarInaccessibleError,
     MoodleCalendarInvalidUrlError,
     MoodleCalendarParseError,
+    _course_id_from_moodle_category,
+    extract_calendar_data,
+    get_semester,
 )
+
+from django.test import TestCase
 
 
 class TestExtractCalendarData(TestCase):
@@ -67,7 +70,7 @@ class TestExtractCalendarData(TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["title"], "Assignment 1")
         self.assertEqual(result[0]["description"], "Complete assignment 1")
-        self.assertIn("CS101", result[0]["course"])
+        self.assertEqual(result[0]["course"].courseID, "CS101")
         self.assertIn("2026-03-15T23:59:59", result[0]["due_date"])
 
     @patch("moodle.utils.requests.get")
@@ -150,7 +153,7 @@ class TestExtractCalendarData(TestCase):
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_course_name_truncation(self, mock_get):
         """
-        Test that course names are truncated to 15 characters
+        Test that long category strings yield a course id within Course.courseID max_length.
 
         Args:
             mock_get (MagicMock): Mocked requests.get function
@@ -175,10 +178,10 @@ class TestExtractCalendarData(TestCase):
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
-        # THEN: we call extract_calendar_data and expect the course name to be truncated to 15 characters
+        # THEN: first segment before _ is capped at model max_length (no _ in this category)
         result = extract_calendar_data(self.calendar_url)
         self.assertEqual(len(result), 1)
-        self.assertLessEqual(len(result[0]["course"]), 15)
+        self.assertLessEqual(len(result[0]["course"].courseID), 20)
 
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_empty_calendar(self, mock_get):
@@ -240,7 +243,7 @@ class TestExtractCalendarData(TestCase):
         result = extract_calendar_data(self.calendar_url)
 
         # All output events should have consistent structure
-        required_keys = {"external_id", "title", "description", "due_date", "course"}
+        required_keys = {"external_id", "title", "description", "due_date", "course", "semester"}
         for event_result in result:
             self.assertEqual(set(event_result.keys()), required_keys)
             # Check types
@@ -248,7 +251,8 @@ class TestExtractCalendarData(TestCase):
             self.assertIsInstance(event_result["title"], str)
             self.assertIsInstance(event_result["description"], str)
             self.assertIsInstance(event_result["due_date"], str)
-            self.assertIsInstance(event_result["course"], str)
+            self.assertIsInstance(event_result["course"], Course)
+            self.assertIsInstance(event_result["semester"], str)
 
     # ==================== SAD PATHS ====================
 
@@ -517,4 +521,18 @@ class TestExtractCalendarData(TestCase):
         # THEN: we call extract_calendar_data and expect it to raise AttributeError
         with self.assertRaises(AttributeError):
             extract_calendar_data(self.calendar_url)
+
+
+class TestMoodleCategoryParsing(TestCase):
+    def test_get_semester_spring(self) -> None:
+        self.assertEqual(get_semester("CSC443_2025SEM2-A"), "Spring")
+
+    def test_get_semester_fall(self) -> None:
+        self.assertEqual(get_semester("CSC443_2025SEM1"), "Fall")
+
+    def test_get_semester_empty_when_no_underscore(self) -> None:
+        self.assertEqual(get_semester("CS101"), "")
+
+    def test_course_id_first_segment(self) -> None:
+        self.assertEqual(_course_id_from_moodle_category("CSC443_2025SEM2-A"), "CSC443")
 
