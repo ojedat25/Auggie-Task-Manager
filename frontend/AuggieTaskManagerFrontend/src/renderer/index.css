@@ -16,7 +16,7 @@
 }
 
 /* Manual dark mode from Settings */
-:root[data-theme = "dark"] {
+:root[data-theme='dark'] {
   --color-base-100: #420303;
   --color-base-200: #350202;
   --color-base-300: #2a0202;
@@ -30,12 +30,12 @@
 }
 
 /* Manual dark mode: style dropdown only */
-:root[data-theme="dark"] .select {
+:root[data-theme='dark'] .select {
   background-color: #130101;
   border-color: #333333;
   color: #ffffff;
 }
-:root[data-theme="dark"] .select option {
+:root[data-theme='dark'] .select option {
   background-color: #130101;
   color: #ffffff;
 }
@@ -58,12 +58,7 @@
 
 body {
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Helvetica,
-    Arial,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
   margin: 0;
   padding: 0;

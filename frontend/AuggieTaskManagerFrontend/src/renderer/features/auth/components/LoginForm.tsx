@@ -20,11 +20,17 @@ type LoginFormProps = {
  * The form uses DaisyUI classes for styling (input, btn, fieldset, etc.)
  * and follows the same pattern as SignUpForm for consistency.
  */
-export const LoginForm = ({ formData, handleChange, handleSubmit }: LoginFormProps) => {
+export const LoginForm = ({
+  formData,
+  handleChange,
+  handleSubmit,
+}: LoginFormProps) => {
   return (
     // Form container with DaisyUI styling - creates a bordered box with background
-    <form className="grid grid-cols-1 gap-4 fieldset bg-base-200 border-base-300 rounded-box border p-4 max-w-md" onSubmit={(e) => handleSubmit(e as React.SubmitEvent)}>
-
+    <form
+      className="grid grid-cols-1 gap-4 fieldset bg-base-200 border-base-300 rounded-box border p-4 max-w-md"
+      onSubmit={(e) => handleSubmit(e as React.SubmitEvent)}
+    >
       {/* Username/Email input field */}
       <label className="fieldset">
         <span className="label">Username or Email</span>
@@ -61,10 +67,13 @@ export const LoginForm = ({ formData, handleChange, handleSubmit }: LoginFormPro
       {/* Link to sign up page */}
       <p className="text-center text-sm mt-2">
         Don't have an account?{' '}
-        <Link to="/signup" className="text-primary font-semibold hover:underline">
+        <Link
+          to="/signup"
+          className="text-primary font-semibold hover:underline"
+        >
           Sign Up
         </Link>
       </p>
-      </form>
+    </form>
   );
 };
