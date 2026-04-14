@@ -1,0 +1,134 @@
+name: Build and Test
+
+on:
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: ["**"]
+
+permissions:
+    contents: write
+
+jobs:
+    lint-backend:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  # Needed to push back to PR branch
+                  fetch-depth: 0
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+            - name: Install Ruff
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install ruff
+            - name: Fix lint + format (Ruff)
+              continue-on-error: true
+              run: |
+                  ruff check --fix
+                  ruff format
+            - name: Commit + push Ruff fixes (PRs only)
+              if: >
+                  github.event_name == 'pull_request' &&
+                  github.event.pull_request.head.repo.full_name == github.repository
+              run: |
+                  if git diff --quiet; then
+                    echo "No Ruff changes."
+                    exit 0
+                  fi
+
+                  git config user.name "github-actions"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+                  git add -A
+                  git commit -m "Github Actions: applying automated Ruff fixes"
+                  git push origin "HEAD:${{ github.head_ref }}"
+            - name: Ensure clean after Ruff
+              run: git diff --exit-code
+            - name: Ruff check (strict)
+              id: ruff_check
+              continue-on-error: true
+              run: |
+                  set -o pipefail
+                  set +e
+                  ruff check --output-format=github 2>&1 | tee ruff_check.txt
+                  status=${PIPESTATUS[0]}
+                  set -e
+                  echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+                  exit "$status"
+
+    lint-frontend:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: frontend/AuggieTaskManagerFrontend
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: npm
+                  cache-dependency-path: frontend/AuggieTaskManagerFrontend/package-lock.json
+            - name: Install dependencies
+              run: npm ci
+            - name: Fix formatting (Prettier)
+              run: npx prettier --write "src/**/*.{ts,tsx,css,json}"
+            - name: Commit + push Prettier fixes (PRs only)
+              if: >
+                  github.event_name == 'pull_request' &&
+                  github.event.pull_request.head.repo.full_name == github.repository
+              run: |
+                  if git diff --quiet; then
+                    echo "No Prettier changes."
+                    exit 0
+                  fi
+
+                  git config user.name "github-actions"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+                  git add -A
+                  git commit -m "Github Actions: applying automated Prettier fixes"
+                  git push origin "HEAD:${{ github.head_ref }}"
+            - name: Ensure clean after Prettier
+              run: git diff --exit-code
+
+    test-backend:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: backend/auggietaskmanager
+        services:
+            postgres:
+                image: postgres:15
+                env:
+                    POSTGRES_USER: auggie
+                    POSTGRES_PASSWORD: auggie
+                    POSTGRES_DB: auggietaskmanager
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+        env:
+            DJANGO_SETTINGS_MODULE: auggietaskmanager.settings
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+            - name: Migrate
+              run: python manage.py migrate --noinput
+            - name: Run tests
+              run: python manage.py test tests --verbosity=2

@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import StudyGroup
+
 
 # Serializer for StudyGroup model
 class StudyGroupSerializer(serializers.ModelSerializer):

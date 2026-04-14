@@ -13,7 +13,8 @@ function formatDueDate(iso: string): string {
 }
 
 export const Homepage = () => {
-  const { displayName, loadingUser, sortedUpcomingTasks, loadingTasks } = useHomepage();
+  const { displayName, loadingUser, sortedUpcomingTasks, loadingTasks } =
+    useHomepage();
 
   const greetingName = displayName || 'Auggie';
 
@@ -93,7 +94,9 @@ export const Homepage = () => {
                     <tr key={t.id}>
                       <td className="font-medium">{t.title}</td>
                       <td className="text-primary">{formatDueDate(t.dueAt)}</td>
-                      <td className="hidden md:table-cell">{t.course ?? '—'}</td>
+                      <td className="hidden md:table-cell">
+                        {t.course ?? '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -111,5 +114,3 @@ export const Homepage = () => {
     </div>
   );
 };
-
-

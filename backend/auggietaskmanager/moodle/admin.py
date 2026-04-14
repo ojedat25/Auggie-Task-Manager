@@ -1,5 +1,6 @@
-from moodle.models import Task
 from django.contrib import admin
+
+from moodle.models import Task
 
 
 # Register your models here.

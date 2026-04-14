@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.utils import timezone
-from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, action
+from rest_framework import status, viewsets
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from django.utils import timezone
 
 from moodle.errors import *
 from moodle.models import Task

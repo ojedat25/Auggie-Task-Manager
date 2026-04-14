@@ -46,7 +46,10 @@ export function useHomepage() {
     async function loadUpcomingTasks() {
       setLoadingTasks(true);
       try {
-        const tasks = await HomePageService.getUpcomingTasks({ limit: 5, days: 7 });
+        const tasks = await HomePageService.getUpcomingTasks({
+          limit: 5,
+          days: 7,
+        });
         if (!cancelled) setUpcomingTasks(tasks);
       } catch {
         // keep dashboard usable if API is down
@@ -70,4 +73,3 @@ export function useHomepage() {
     loadingTasks,
   };
 }
-

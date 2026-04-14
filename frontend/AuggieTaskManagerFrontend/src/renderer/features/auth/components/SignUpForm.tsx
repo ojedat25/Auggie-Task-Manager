@@ -2,13 +2,22 @@ import { SignupData } from '../../../types/user';
 
 type SignUpFormProps = {
   formData: SignupData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   handleSubmit: (e: React.SubmitEvent) => void;
 };
 
-export const SignUpForm = ({ formData, handleChange, handleSubmit }: SignUpFormProps) => {
+export const SignUpForm = ({
+  formData,
+  handleChange,
+  handleSubmit,
+}: SignUpFormProps) => {
   return (
-    <form className="grid grid-cols-2 gap-4 fieldset bg-base-200 border-base-300 rounded-box border p-4 max-w-2xl" onSubmit={(e) => handleSubmit(e as React.SubmitEvent)}>
+    <form
+      className="grid grid-cols-2 gap-4 fieldset bg-base-200 border-base-300 rounded-box border p-4 max-w-2xl"
+      onSubmit={(e) => handleSubmit(e as React.SubmitEvent)}
+    >
       <label className="fieldset">
         <span className="label">First Name</span>
         <input
@@ -89,7 +98,13 @@ export const SignUpForm = ({ formData, handleChange, handleSubmit }: SignUpFormP
       </label>
       <label className="fieldset">
         <span className="label">Major</span>
-        <select name="major" value={formData.major} onChange={handleChange} className="select select-primary validator" required>
+        <select
+          name="major"
+          value={formData.major}
+          onChange={handleChange}
+          className="select select-primary validator"
+          required
+        >
           <option value="">Select a major</option>
           <option value="CS">Computer Science</option>
           <option value="CpE">Computer Engineering</option>
@@ -106,7 +121,12 @@ export const SignUpForm = ({ formData, handleChange, handleSubmit }: SignUpFormP
       </label>
       <label className="fieldset">
         <span className="label">Minor</span>
-        <select name="minor" value={formData.minor} onChange={handleChange} className="select select-primary validator">
+        <select
+          name="minor"
+          value={formData.minor}
+          onChange={handleChange}
+          className="select select-primary validator"
+        >
           <option value="">Select a minor</option>
           <option value="CS">Computer Science</option>
           <option value="CpE">Computer Engineering</option>

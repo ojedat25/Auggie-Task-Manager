@@ -5,6 +5,7 @@ import { useAuth } from '../../features/auth/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { AlertCard } from '../common/AlertCard';
 import { StudyGroupList } from '../../features/studygroups/components/studyGroupsList';
+import { SettingsScreen } from '../../features/dashboard/components/Settings';
 
 import {
   Menu,
@@ -55,17 +56,21 @@ export const DashboardLayout = () => {
       case 'Homepage':
         return <Homepage />;
       case 'Settings':
-        return <div className = "p-4">Settings content</div>
+        return <SettingsScreen />;
       case 'Task List':
-        return <div className = "p-4"><Tasks /></div>
+        return (
+          <div className="p-4">
+            <Tasks />
+          </div>
+        );
       case 'Task Calendar':
-        return <div className = "p-4">Task Calendar content</div>
+        return <div className="p-4">Task Calendar content</div>;
       case 'Study Groups':
         return <div className = "p-4"><StudyGroupList /></div>
       default:
-        return <div className = "p-4">Page Content</div>;
+        return <div className="p-4">Page Content</div>;
     }
-  }
+  };
 
   return (
     <>
@@ -79,7 +84,7 @@ export const DashboardLayout = () => {
           {/* Page content here */}
           <div className="p-4">{renderContent()}</div>
         </div>
-        
+
         <div className="drawer-side is-drawer-close:overflow-visible">
           <label
             htmlFor="my-drawer-4"
@@ -101,4 +106,4 @@ export const DashboardLayout = () => {
   );
 };
 
-
+export default DashboardLayout;

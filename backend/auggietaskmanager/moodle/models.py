@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 # This model represents a course in Moodle that can be associated with tasks and study groups.

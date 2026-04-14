@@ -80,7 +80,11 @@ export const Login = () => {
       {error && <AlertCard type="error" message={error} />}
 
       {/* Render the actual login form */}
-      <LoginForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
+      <LoginForm
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+      />
     </>
   );
 };

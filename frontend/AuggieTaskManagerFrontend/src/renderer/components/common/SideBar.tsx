@@ -8,7 +8,12 @@ interface SideBarProps {
   handleLogout: () => Promise<void>;
 }
 
-export const SideBar = ({ sideBarItems, activeItem, setActiveItem, handleLogout }: SideBarProps) => {
+export const SideBar = ({
+  sideBarItems,
+  activeItem,
+  setActiveItem,
+  handleLogout,
+}: SideBarProps) => {
   // Handle the click event for the sidebar items
   const handleItemClick = (item: string) => {
     if (item === 'Logout') {

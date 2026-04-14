@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 class UserProfile(models.Model):
     # Each user has one profile, and each profile is linked to one user
