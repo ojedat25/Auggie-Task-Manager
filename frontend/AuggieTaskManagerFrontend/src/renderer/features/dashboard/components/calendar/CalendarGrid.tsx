@@ -13,7 +13,7 @@ export function CalendarGrid(props: {
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-215">
+      <div className="min-w-[215px]">
         <div className="grid grid-cols-7 gap-px rounded-box bg-base-300 p-px">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
             <div
