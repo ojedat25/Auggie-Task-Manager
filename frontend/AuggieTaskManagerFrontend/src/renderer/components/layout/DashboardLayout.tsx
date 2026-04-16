@@ -54,7 +54,12 @@ export const DashboardLayout = () => {
       case 'Profile':
         return <Profile />;
       case 'Homepage':
-        return <Homepage />;
+        return (
+          <Homepage
+            onViewAllTasks={() => setActiveItem('Task List')}
+            onViewCalendar={() => setActiveItem('Task Calendar')}
+          />
+        );
       case 'Settings':
         return <SettingsScreen />;
       case 'Task List':
@@ -64,8 +69,11 @@ export const DashboardLayout = () => {
           </div>
         );
       case 'Task Calendar':
-        return <div className="p-4">Task Calendar content</div>;
-        return <TaskCalendar />;
+        return (
+          <div className="p-4">
+            <TaskCalendar />
+          </div>
+        );
       case 'Study Groups':
         return <div className="p-4">Study Groups content</div>;
       default:

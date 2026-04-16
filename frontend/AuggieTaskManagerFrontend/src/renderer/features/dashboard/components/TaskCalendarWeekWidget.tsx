@@ -55,30 +55,24 @@ export const TaskCalendarWeekWidget = () => {
                 <div className="text-xs opacity-60">—</div>
               ) : (
                 <div className="space-y-1">
-                  {dayTasks.slice(0, 2).map((t) => (
-                    <div
-                      key={String(t.id)}
-                      className="flex items-center gap-1.5"
-                    >
-                      <span className={taskBadgeClasses(t)}>
-                        {t.source === 'moodle' ? 'M' : 'U'}
-                      </span>
-                      <div
-                        className={
-                          'truncate text-xs ' +
-                          (t.completed ? 'line-through opacity-70' : '')
-                        }
-                        title={t.title}
-                      >
-                        {t.title}
+                  <div className="max-h-28 overflow-auto space-y-1">
+                    {dayTasks.map((t) => (
+                      <div key={String(t.id)} className="flex items-center gap-1.5">
+                        <span className={taskBadgeClasses(t)}>
+                          {t.source === 'moodle' ? 'M' : 'U'}
+                        </span>
+                        <div
+                          className={
+                            'truncate text-xs ' +
+                            (t.completed ? 'line-through opacity-70' : '')
+                          }
+                          title={t.title}
+                        >
+                          {t.title}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {dayTasks.length > 2 && (
-                    <div className="text-xs opacity-60">
-                      +{dayTasks.length - 2}
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
