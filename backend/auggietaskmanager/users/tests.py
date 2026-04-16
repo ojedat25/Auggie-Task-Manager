@@ -1,5 +1,7 @@
 
 from .models import UserProfile
+
+
 # Create your tests here.
 class UserProfileModelTest(TestCase):
     def test_profile_created_with_user(self):
