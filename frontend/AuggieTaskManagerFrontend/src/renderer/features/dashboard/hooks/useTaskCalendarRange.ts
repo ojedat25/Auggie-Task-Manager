@@ -57,7 +57,7 @@ export function useTaskCalendarRange(params: { start: Date; days: number }) {
       setError(null);
       try {
         const startIso = rangeStart.toISOString();
-        const endIso = addDays(rangeEnd, 1).toISOString();
+        const endIso = new Date(addDays(rangeEnd, 1).getTime() - 1).toISOString();
         const data = await TaskService.getCalendarTasks({
           start: startIso,
           end: endIso,
