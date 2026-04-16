@@ -3,6 +3,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('moodle/', include('moodle.urls')),
-    path('users/', include('users.urls'))
+    path('tasks/', include('moodle.urls')),
+    path('users/', include('users.urls')),
+    path('groups/', include('groups.urls'))
 ]

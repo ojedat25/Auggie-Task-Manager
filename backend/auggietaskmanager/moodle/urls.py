@@ -1,9 +1,15 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+
+from django.urls import include, path
 
 from . import views
 
-app_name = 'moodle'
+app_name = "moodle"
+
+router = DefaultRouter()
+router.register(r"", views.TaskViewSet, basename="task")
 
 urlpatterns = [
-    path('', views.api_root),
+    path("api/", views.api_root),
+    path("", include(router.urls)),
 ]

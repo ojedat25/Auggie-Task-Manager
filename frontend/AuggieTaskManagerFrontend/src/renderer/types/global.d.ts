@@ -2,7 +2,8 @@
  * Extend Window for APIs exposed via preload contextBridge.
  */
 export interface ElectronAPI {
-  // invoke?: (channel: string, ...args: unknown[]) => Promise<unknown>;
+  /** Reserved for preload-exposed IPC. */
+  invoke?: (channel: string, ...args: unknown[]) => Promise<unknown>;
 }
 
 declare global {

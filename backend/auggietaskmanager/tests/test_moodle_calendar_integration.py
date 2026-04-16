@@ -1,13 +1,14 @@
 # This file contains integration tests for the extract_calendar_data function in moodle.utils.
 
 from datetime import datetime, timedelta
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytz
 from icalendar import Calendar, Event
-
+from moodle.models import Course
 from moodle.utils import extract_calendar_data
+
+from django.test import TestCase
 
 
 class TestExtractCalendarDataIntegration(TestCase):
@@ -54,6 +55,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -68,7 +70,7 @@ class TestExtractCalendarDataIntegration(TestCase):
             self.assertIn(":", event["title"])  # Course code included
             self.assertIsNotNone(event["description"])
             self.assertIsNotNone(event["due_date"])
-            courses_found.add(event["course"][:3])  # First 3 chars of course code
+            courses_found.add(str(event["course"].courseID)[:3])  # First 3 chars of course code
 
         self.assertGreaterEqual(len(courses_found), 3)
 
@@ -98,6 +100,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -128,7 +131,7 @@ class TestExtractCalendarDataIntegration(TestCase):
             (pytz.timezone("US/Pacific"), "Pacific Event", "2026-03-15T12:00:00"),
         ]
 
-        for tz, title, time_str in timezones:
+        for tz, title, _time_str in timezones:
             event = Event()
             event.add("summary", title)
             event.add("description", f"Event in {tz}")
@@ -139,6 +142,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -183,6 +187,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -222,6 +227,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -259,6 +265,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -295,6 +302,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -307,12 +315,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_request_called_with_url(self, mock_get):
-        """
-        Test that requests.get is called with the correct URL
-
-        Args:
-            mock_get (MagicMock): Mocked requests.get function
-        """
+        """Test that requests.get is called with the correct URL"""
         # GIVEN: a calendar with no events
         cal = Calendar()
         cal.add("prodid", "-//Test//Test//EN")
@@ -320,6 +323,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -327,16 +331,11 @@ class TestExtractCalendarDataIntegration(TestCase):
         extract_calendar_data(self.calendar_url)
 
         # THEN: requests.get should have been called with the correct URL
-        mock_get.assert_called_once_with(self.calendar_url)
+        mock_get.assert_called_once_with(self.calendar_url, timeout=10)
 
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_output_structure_consistency(self, mock_get):
-        """
-        Test that all output events have consistent structure
-
-        Args:
-            mock_get (MagicMock): Mocked requests.get function
-        """
+        """Test that all output events have consistent structure"""
         # GIVEN: a calendar with diverse events
         cal = Calendar()
         cal.add("prodid", "-//Test//Consistency//EN")
@@ -354,6 +353,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -361,14 +361,16 @@ class TestExtractCalendarDataIntegration(TestCase):
         result = extract_calendar_data(self.calendar_url)
 
         # All output events should have consistent structure
-        required_keys = {"title", "description", "due_date", "course"}
+        required_keys = {"external_id", "title", "description", "due_date", "course", "semester"}
         for event_result in result:
             self.assertEqual(set(event_result.keys()), required_keys)
             # Check types
+            self.assertIsInstance(event_result["external_id"], str)
             self.assertIsInstance(event_result["title"], str)
             self.assertIsInstance(event_result["description"], str)
             self.assertIsInstance(event_result["due_date"], str)
-            self.assertIsInstance(event_result["course"], str)
+            self.assertIsInstance(event_result["course"], Course)
+            self.assertIsInstance(event_result["semester"], str)
 
     @patch("moodle.utils.requests.get")
     def test_extract_calendar_data_end_of_semester_crunch(self, mock_get):
@@ -397,6 +399,7 @@ class TestExtractCalendarDataIntegration(TestCase):
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 
@@ -433,13 +436,14 @@ class TestExtractCalendarDataIntegration(TestCase):
         for idx, date in enumerate(dates):
             event = Event()
             event.add("summary", f"Boundary Event {idx+1}")
-            event.add("description", f"Event on boundary")
+            event.add("description", "Event on boundary")
             event.add("categories", "MULTI")
             event.add("dtend", date)
             cal.add_component(event)
 
         # AND: we mock the requests.get to return this calendar
         mock_response = MagicMock()
+        mock_response.status_code = 200
         mock_response.content = cal.to_ical()
         mock_get.return_value = mock_response
 

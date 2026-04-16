@@ -4,9 +4,7 @@ export function createApplicationMenu(): void {
   const template: Electron.MenuItemConstructorOptions[] = [
     {
       label: 'File',
-      submenu: [
-        { role: 'quit' as const },
-      ],
+      submenu: [{ role: 'quit' as const }],
     },
     {
       label: 'Edit',

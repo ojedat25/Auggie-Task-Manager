@@ -11,3 +11,4 @@ requests==2.32.5
 icalendar==7.0.1
 pytz==2025.2
 django-stubs==5.2.9
+pillow==12.2.0

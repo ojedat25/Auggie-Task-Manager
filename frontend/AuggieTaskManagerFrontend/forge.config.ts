@@ -10,6 +10,7 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+import { preloadConfig } from './webpack.preload.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -26,6 +27,8 @@ const config: ForgeConfig = {
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
       mainConfig,
+      devContentSecurityPolicy:
+        "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:; connect-src 'self' http://127.0.0.1:8000 http://localhost:8000",
       renderer: {
         config: rendererConfig,
         entryPoints: [
@@ -34,6 +37,7 @@ const config: ForgeConfig = {
             js: './src/renderer/renderer.tsx',
             name: 'main_window',
             preload: {
+              config: preloadConfig, // 👈 add this
               js: './src/preload/preload.ts',
             },
           },

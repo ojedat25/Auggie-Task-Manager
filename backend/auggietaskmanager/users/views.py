@@ -1,8 +1,10 @@
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.shortcuts import render
 
 from .models import UserProfile
 
@@ -17,7 +19,7 @@ class UserSignUpView(APIView):
         lastname = request.data.get("lastname")
         email = request.data.get("email")
 
-        schoolyear = request.data.get("schoolyear")
+        schoolyear = request.data.get("schoolyear", "")
         major = request.data.get("major", "")
         minor = request.data.get("minor", "")
         if not username or not password or not email:
@@ -32,3 +34,111 @@ class UserSignUpView(APIView):
         UserProfile.objects.create(user=user, schoolYear=schoolyear, major=major, minor=minor)
 
         return Response({"message": "User created successfully."}, status=201)
+
+class UserLoginView(APIView):
+    def post (self, request):
+        # Grabing the username and password from the frontend request
+        identifier = request.data.get("username") or request.data.get("email") or request.data.get("identifier")
+        password = request.data.get("password")
+        
+        # Checking to see if credentials were valid
+        if not identifier or not password:
+            return Response({"error": "Username/email and password are required."}, status = 400)
+        
+        # Finding the user by username or email
+        user = User.objects.filter(username = identifier).first()
+        if not user:
+            user = User.objects.filter(email = identifier).first()
+        
+        if not user:
+            return Response({"error": "Invalid Credentials"}, status = 401)
+        
+        auth_user = authenticate(username = user.username, password = password)
+        if auth_user is None:
+            return Response({"error": "Invalid Credentials"}, status=401)
+
+        token, _ = Token.objects.get_or_create(user = auth_user)
+        
+        # User data from the frontend request
+        user_data = {
+            "id": auth_user.id,
+            "username": auth_user.username,
+            "email": auth_user.email,
+            "first_name": auth_user.first_name,
+            "last_name": auth_user.last_name,
+        }
+        # Response matches frontend AuthResonse shape
+        return Response(
+            {
+                "token": token.key,
+                "user": user_data,
+                "message": "Login successful.",
+            },
+            status = 200
+        )
+
+
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        Token.objects.filter(user=request.user).delete()
+        return Response({"message": "Logout successful."}, status=200)
+
+class UserProfileView(APIView):
+    # Only authenticated users can access this view, uses default authentication class (TokenAuthentication)
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request): # Gets the user's profile data
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return Response({
+            "user": user_data,
+            "schoolYear": user_profile.schoolYear,
+            "major": user_profile.major,
+            "minor": user_profile.minor,
+            "bio": user_profile.bio,
+            "moodle_url": user_profile.moodle_url,
+            "created_at": user_profile.created_at,
+        }, status=200)
+        
+    def patch(self, request): # Updates the user's profile data
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.schoolYear = request.data.get("schoolYear", user_profile.schoolYear)
+        user_profile.major = request.data.get("major", user_profile.major)
+        user_profile.minor = request.data.get("minor", user_profile.minor)
+        user_profile.bio = request.data.get("bio", user_profile.bio)
+        user_profile.moodle_url = request.data.get("moodle_url", user_profile.moodle_url)
+        user_profile.save()
+        user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        return Response({
+            "user": user_data,
+            "schoolYear": user_profile.schoolYear,
+            "major": user_profile.major,
+            "minor": user_profile.minor,
+            "bio": user_profile.bio,
+            "moodle_url": user_profile.moodle_url,
+            "created_at": user_profile.created_at,
+            "message": "Profile updated successfully.",
+        }, status=200)
+    
+    def delete(self, request): # Deletes the user from the database and all associated data
+        user = request.user
+        user.delete()
+        return Response({
+            "message": "User deleted successfully.",
+        }, status=200)

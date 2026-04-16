@@ -39,9 +39,17 @@ INSTALLED_APPS = [
     'corsheaders',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'moodle',
     'users',
+    'groups',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -85,9 +93,8 @@ DATABASES = {
         'PASSWORD': 'auggie',   # use env var in production
         'HOST': '127.0.0.1',
         'PORT': '5432',
-    }
+    },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
