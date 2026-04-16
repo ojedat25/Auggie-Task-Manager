@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStudyGroups } from '../hooks/useStudyGroups';
+import { API_BASE } from '../../../../config';
 
 export const StudyGroupList: React.FC = () => {
-  const { groups, loading, error } = useStudyGroups();
+  const { groups, loading, error, fetchStudyGroups } = useStudyGroups();
+
+  useEffect(() => {
+    fetchStudyGroups();
+  }, [fetchStudyGroups]);
 
   if (loading) return <p>Loading study groups...</p>;
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
@@ -23,7 +28,11 @@ export const StudyGroupList: React.FC = () => {
                 {group.image ? (
                   <img
                     className="e-avatar"
-                    src={`/media/${group.image}`}
+                    src={
+                      group.image.startsWith('http')
+                        ? group.image
+                        : `${API_BASE}${group.image.startsWith('/') ? '' : '/'}${group.image}`
+                    }
                     alt={group.name}
                     style={{
                       width: '100px',

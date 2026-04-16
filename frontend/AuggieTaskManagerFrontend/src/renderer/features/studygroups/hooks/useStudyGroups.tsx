@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { StudyGroupService } from '../services/studyGroupService';
 import { StudyGroup } from '../../../types/studyGroup';
@@ -8,7 +8,7 @@ export const useStudyGroups = () => {
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<StudyGroup[]>([]);
 
-  const fetchStudyGroups = async (): Promise<StudyGroup[] | null> => {
+  const fetchStudyGroups = useCallback(async (): Promise<StudyGroup[] | null> => {
     setLoading(true);
     setError(null);
 
@@ -22,7 +22,7 @@ export const useStudyGroups = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { loading, error, groups, fetchStudyGroups };
 };
