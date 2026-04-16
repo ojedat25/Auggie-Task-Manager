@@ -12,7 +12,7 @@ from .serializers import StudyGroupSerializer
 
 class StudyGroupListCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(request):
+    def get(self, request):
         """
         GET: Returns all groups the authenticated user is a member of
         """
@@ -26,7 +26,7 @@ class StudyGroupListCreateView(APIView):
         # The Response object is used to return the serialized data as an HTTP response. The data is typically returned in JSON format, which can be easily consumed by frontend applications or other clients.
         return Response(serializer.data)
         
-    def post(request):
+    def post(self, request):
         """
         POST: Creates a new StudyGroup
         """

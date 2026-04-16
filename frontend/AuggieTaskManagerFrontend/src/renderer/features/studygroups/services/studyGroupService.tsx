@@ -3,7 +3,7 @@ import { StudyGroup } from '../../../types/studyGroup';
 const BASE_URL = '/groups';
 
 export async function fetchStudyGroups(): Promise<StudyGroup[]> {
-  const response = await fetch(`${BASE_URL}/studygroups`, {
+  const response = await fetch(`${BASE_URL}/`, {
     credentials: 'include',
   });
 
