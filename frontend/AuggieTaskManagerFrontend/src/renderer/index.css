@@ -79,9 +79,9 @@ body {
   outline-offset: 2px;
 }
 
-/* Dark mode: fieldsets use theme surfaces (no extra maroon panel on .fieldset) */
+/* Dark mode: label field groups stay flush; keep card background on form.fieldset */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .fieldset {
+  :root:not([data-theme]) label.fieldset {
     background-color: transparent;
     border-color: transparent;
   }

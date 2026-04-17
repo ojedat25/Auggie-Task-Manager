@@ -1,11 +1,11 @@
 import type { Configuration } from 'webpack';
-import { rules } from './webpack.rules';
+import { electronMainRules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
 import path from 'path';
 
 export const mainConfig: Configuration = {
   entry: './src/main/main.ts',
-  module: { rules },
+  module: { rules: electronMainRules },
   plugins,
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
@@ -20,6 +20,6 @@ export const mainConfig: Configuration = {
   },
   externals: {
     electron: 'commonjs electron', // keep electron native
-    fs: 'commonjs fs',             // keep fs native
+    fs: 'commonjs fs', // keep fs native
   },
 };
