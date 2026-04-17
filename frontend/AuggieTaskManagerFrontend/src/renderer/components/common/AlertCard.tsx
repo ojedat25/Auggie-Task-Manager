@@ -39,7 +39,10 @@ export const AlertCard = ({
 
   useEffect(() => {
     if (wasVisibleRef.current && !isVisible) {
-      onDismissRef.current?.();
+      const id = window.setTimeout(() => {
+        onDismissRef.current?.();
+      }, 200);
+      return () => window.clearTimeout(id);
     }
     wasVisibleRef.current = isVisible;
   }, [isVisible]);
@@ -50,7 +53,7 @@ export const AlertCard = ({
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <div className={`alert alert-${type}`}>
+      <div className={`alert alert-${type} pointer-events-auto`}>
         <span>{message}</span>
       </div>
     </div>
