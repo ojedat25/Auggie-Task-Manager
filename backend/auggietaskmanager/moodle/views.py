@@ -68,12 +68,12 @@ class TaskViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if user_profile.moodle_url != moodle_url:
-            user_profile.moodle_url = moodle_url
-            user_profile.save(update_fields=['moodle_url'])
 
         try:
             tasks = sync_moodle_tasks(moodle_url, request.user)
+            if user_profile.moodle_url != moodle_url:
+                user_profile.moodle_url = moodle_url
+                user_profile.save(update_fields=['moodle_url'])
 
             serializer = self.get_serializer(tasks, many=True)
             return Response(

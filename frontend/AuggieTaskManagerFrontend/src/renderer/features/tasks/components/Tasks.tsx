@@ -9,6 +9,7 @@ export const Tasks = () => {
     isAscending,
     setIsAscending,
     errorMessage,
+    clearErrorMessage,
     moodleUrl,
     setMoodleUrl,
     hasMoodleUrl,
@@ -28,7 +29,13 @@ export const Tasks = () => {
 
   return (
     <div>
-      {errorMessage && <AlertCard type="error" message={errorMessage} />}
+      {errorMessage && (
+        <AlertCard
+          type="error"
+          message={errorMessage}
+          onDismiss={clearErrorMessage}
+        />
+      )}
       {!hasMoodleUrl && (
         <div className="rounded-box border border-base-300 bg-base-200/40 p-4 shadow-sm">
           <fieldset className="fieldset">
