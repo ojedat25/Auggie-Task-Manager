@@ -123,7 +123,7 @@ export class HomePageService {
   static async getDisplayName(): Promise<string> {
     // Prefer cached user data.
     const cachedUser =
-      AuthService.getCurrentUser?.() ?? getUserFromLocalStorage();
+      getUserFromLocalStorage();
     const cachedName = getDisplayNameFromUser(cachedUser);
     if (cachedName) return cachedName;
 
