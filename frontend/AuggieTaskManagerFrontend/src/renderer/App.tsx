@@ -32,8 +32,10 @@ function SessionExpiredListener(): null {
 }
 
 function App() {
+  const initialPath = AuthService.isAuthenticated() ? '/' : '/login';
+
   return (
-    <MemoryRouter initialEntries={['/login']}>
+    <MemoryRouter initialEntries={[initialPath]}>
       <SessionExpiredListener />
       <Routes>
         {/* Protected routes */}
