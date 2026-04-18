@@ -12,10 +12,9 @@ import { AuthService } from '../../auth/services/authService';
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const initialUser = AuthService.getCurrentUser();
   const [moodleUrl, setMoodleUrl] = useState<string | null>(
-    Boolean(AuthService.getCurrentUser()?.moodle_url)
-      ? AuthService.getCurrentUser()?.moodle_url
-      : null
+    Boolean(initialUser?.moodle_url) ? initialUser.moodle_url : null
   );
   const [isAscending, setIsAscending] = useState<boolean>(true);
   const [hasMoodleUrl, setHasMoodleUrl] = useState<boolean>(
@@ -151,12 +150,17 @@ export function useTasks() {
     });
   }, [tasks, isAscending]);
 
+  const clearErrorMessage = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
+
   return {
     tasks,
     sortedTasks,
     isAscending,
     setIsAscending,
     errorMessage,
+    clearErrorMessage,
     moodleUrl,
     setMoodleUrl,
     hasMoodleUrl,

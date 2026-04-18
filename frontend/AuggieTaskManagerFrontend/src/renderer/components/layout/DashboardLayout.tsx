@@ -34,6 +34,7 @@ export const DashboardLayout = () => {
   const [activeItem, setActiveItem] = useState<string>('Homepage'); // The active item in the sidebar
   const [message, setMessage] = useState<string | null>(null); // The message to be displayed in the AlertCard
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // The error message to be displayed in the AlertCard
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { logOut, error } = useAuth();
 
@@ -46,6 +47,11 @@ export const DashboardLayout = () => {
     } else {
       setErrorMessage(error ?? 'Logout failed'); // Set the error message to the error
     }
+  };
+
+  const handleSidebarItemChange = (item: string) => {
+    setActiveItem(item);
+    setDrawerOpen(false);
   };
 
   const renderContent = () => {
@@ -73,13 +79,35 @@ export const DashboardLayout = () => {
 
   return (
     <>
-      {message && <AlertCard type="success" message={message} />}
-      {errorMessage && <AlertCard type="error" message={errorMessage} />}
+      {message && (
+        <AlertCard
+          type="success"
+          message={message}
+          onDismiss={() => setMessage(null)}
+        />
+      )}
+      {errorMessage && (
+        <AlertCard
+          type="error"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage(null)}
+        />
+      )}
       <div className="drawer lg:drawer-open">
-        <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+        <input
+          id="my-drawer-4"
+          type="checkbox"
+          className="drawer-toggle"
+          checked={drawerOpen}
+          onChange={(e) => setDrawerOpen(e.target.checked)}
+        />
         <div className="drawer-content">
           {/* Navbar */}
-          <NavBar title="Dashboard" />
+          <NavBar
+            title="Dashboard"
+            drawerOpen={drawerOpen}
+            onDrawerOpenChange={setDrawerOpen}
+          />
           {/* Page content here */}
           <div className="p-4">{renderContent()}</div>
         </div>
@@ -96,7 +124,8 @@ export const DashboardLayout = () => {
               handleLogout={handleLogout}
               sideBarItems={sideBarItems}
               activeItem={activeItem}
-              setActiveItem={setActiveItem}
+              setActiveItem={handleSidebarItemChange}
+              drawerOpen={drawerOpen}
             />
           </div>
         </div>

@@ -21,7 +21,7 @@ import { AuthService } from '../services/authService';
  */
 export const Login = () => {
   // Get authentication functions and state from our custom hook
-  const { logIn, error, message } = useAuth();
+  const { logIn, error, message, clearFeedback } = useAuth();
 
   // Form data state - stores what the user types in the input fields
   const initialFormData: LoginData = {
@@ -74,10 +74,14 @@ export const Login = () => {
   return (
     <>
       {/* Show success message if login succeeded */}
-      {message && <AlertCard type="success" message={message} />}
+      {message && (
+        <AlertCard type="success" message={message} onDismiss={clearFeedback} />
+      )}
 
       {/* Show error message if login failed */}
-      {error && <AlertCard type="error" message={error} />}
+      {error && (
+        <AlertCard type="error" message={error} onDismiss={clearFeedback} />
+      )}
 
       {/* Render the actual login form */}
       <LoginForm

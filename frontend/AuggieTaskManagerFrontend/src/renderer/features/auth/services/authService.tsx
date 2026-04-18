@@ -52,7 +52,6 @@ export class AuthService {
       // Cache full user profile (includes moodle_url, etc.)
       try {
         const profile = await this.getUserProfile();
-        console.log('profile', profile);
         this.saveUser(profile);
       } catch {
         // Fallback to minimal user payload from login response.
