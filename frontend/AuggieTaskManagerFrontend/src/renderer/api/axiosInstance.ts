@@ -3,7 +3,7 @@
  * Set baseURL and add request/response interceptors (auth, errors) here.
  */
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import {AuthService} from '../features/auth/services/authService';
+import { AuthService } from '../features/auth/services/authService';
 import { API_BASE } from '../../config';
 import { ENDPOINTS } from './endpoints';
 
