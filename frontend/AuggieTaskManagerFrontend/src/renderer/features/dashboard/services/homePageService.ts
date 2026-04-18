@@ -66,11 +66,6 @@ function getUserFromLocalStorage(): unknown | null {
   return null;
 }
 
-function getUserFromSessionStorage(): unknown | null {
-  const parsed = safeParseJson(sessionStorage.getItem('user'));
-  return parsed ?? null;
-}
-
 // Mock data until we have a stable "upcoming" endpoint.
 export function getMockUpcomingTasks(now = new Date()): UpcomingTask[] {
   const base = now.getTime();
@@ -127,10 +122,7 @@ function toUpcomingTask(task: any): UpcomingTask {
 export class HomePageService {
   static async getDisplayName(): Promise<string> {
     // Prefer cached user data.
-    const cachedUser =
-      AuthService.getCurrentUser?.() ??
-      getUserFromSessionStorage() ??
-      getUserFromLocalStorage();
+    const cachedUser = getUserFromLocalStorage();
     const cachedName = getDisplayNameFromUser(cachedUser);
     if (cachedName) return cachedName;
 
