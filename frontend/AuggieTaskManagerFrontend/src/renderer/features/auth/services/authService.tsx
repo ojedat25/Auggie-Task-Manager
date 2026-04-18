@@ -7,11 +7,11 @@ import {
   AuthResponse,
 } from '../../../types/user';
 
+// Key used to store the authentication token in localStorage
+export const TOKEN_KEY = 'auggie_token';
+export const USER_KEY = 'user';
 // Handles all authentication-related API calls and session management
 export class AuthService {
-  // Key used to store the authentication token in localStorage
-  private static TOKEN_KEY = 'auggie_token';
-
   // Fetch the currently logged-in user's profile from the backend
   static async getUserProfile(): Promise<UserProfile> {
     try {
@@ -78,17 +78,17 @@ export class AuthService {
 
   // Save authentication token to localStorage
   static saveToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+    localStorage.setItem(TOKEN_KEY, token);
   }
 
   // Retrieve authentication token from localStorage
   static getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY);
   }
 
   // Remove authentication token from localStorage
   static removeToken(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
   }
 
   // Check if a user is currently authenticated
@@ -98,17 +98,17 @@ export class AuthService {
 
   // Retrieve the current user's data from localStorage
   static getCurrentUser() {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem(USER_KEY);
     return userJson ? JSON.parse(userJson) : null;
   }
 
   // Save the current user's data to localStorage
   static saveUser(user: UserProfile): void {
     // Store user data in localStorage
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
   static removeUser(): void {
-    localStorage.removeItem('user');
+    localStorage.removeItem(USER_KEY);
   }
 }
