@@ -9,6 +9,43 @@ import { AuthService } from '../../auth/services/authService';
 /**
  * Returns task rows, Moodle URL UI state, and handlers wired to TaskService.
  */
+
+// weekStartsOn: 0 = Sunday, 1 = Monday
+export function startOfCurrentWeek(weekStartsOn: 0 | 1 = 1, date?: Date): Date {
+  const now = date ?? new Date();
+  const day = now.getDay(); // 0..6
+  const diff = (day - weekStartsOn + 7) % 7;
+
+  const start = new Date(now);
+  start.setDate(now.getDate() - diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+export function endOfCurrentWeek(weekStartsOn: 0 | 1 = 1, date?: Date): Date {
+  const end = new Date(startOfCurrentWeek(weekStartsOn, date));
+  end.setDate(end.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+export function startOfCurrentMonth(date?: Date): Date {
+  const start  = date ?? new Date(); // start of the current month
+  start.setDate(1); // set to the first day of the month
+  start.setHours(0, 0, 0, 0); // set to the start of the day
+  return start;
+}
+
+export function endOfCurrentMonth(date?: Date): Date {
+  const end = date ?? new Date(); // end of the current month
+  end.setMonth(end.getMonth() + 1); // set to the next month
+  end.setDate(0); // set to the last day of the month
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -67,6 +104,30 @@ export function useTasks() {
       setTasks(fetched);
     } catch {
       setErrorMessage('Error fetching tasks');
+    }
+  }, []);
+
+  const fetchWeeklyTasks = useCallback(async ( start?: Date, end?: Date ) => {
+    try {
+      const fetched = await TaskService.getTasks({
+        start: start.toISOString(),
+        end: end.toISOString(),
+      });
+      setTasks(fetched);
+    } catch {
+      setErrorMessage('Error fetching weekly tasks');
+    }
+  }, []);
+
+  const fetchMonthlyTasks = useCallback(async ( start?: Date, end?: Date ) => {
+    try {
+      const fetched = await TaskService.getTasks({
+        start: start.toISOString(),
+        end: end.toISOString(),
+      });
+      setTasks(fetched);
+    } catch {
+      setErrorMessage('Error fetching monthly tasks');
     }
   }, []);
 
