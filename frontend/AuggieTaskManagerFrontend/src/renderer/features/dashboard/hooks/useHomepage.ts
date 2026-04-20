@@ -15,8 +15,9 @@ export function useHomepage() {
   const sortedUpcomingTasks = useMemo(() => {
     return upcomingTasks
       .slice()
-      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
-      .slice(0, 5);
+      .sort(
+        (a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+      );
   }, [upcomingTasks]);
 
   useEffect(() => {
@@ -46,10 +47,8 @@ export function useHomepage() {
     async function loadUpcomingTasks() {
       setLoadingTasks(true);
       try {
-        const tasks = await HomePageService.getUpcomingTasks({
-          limit: 5,
-          days: 7,
-        });
+        // Fetch all upcoming tasks for the next 7 days (no client-side limit).
+        const tasks = await HomePageService.getUpcomingTasks({ days: 7 });
         if (!cancelled) setUpcomingTasks(tasks);
       } catch {
         // keep dashboard usable if API is down

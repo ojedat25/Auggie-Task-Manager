@@ -13,4 +13,5 @@ export const ENDPOINTS = {
   PROFILE_DETAIL: (userId: number) => `/users/profile/${userId}/`,
 
   TASKS_UPCOMING: '/tasks/upcoming/',
+  TASKS_CALENDAR: '/tasks/calendar/',
 } as const;

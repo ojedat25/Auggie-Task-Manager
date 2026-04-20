@@ -1,4 +1,5 @@
 import { useHomepage } from '../hooks/useHomepage';
+import { TaskCalendarWeekWidget } from './TaskCalendarWeekWidget';
 
 function formatDueDate(iso: string): string {
   const d = new Date(iso);
@@ -12,7 +13,12 @@ function formatDueDate(iso: string): string {
   });
 }
 
-export const Homepage = () => {
+type HomepageProps = {
+  onViewAllTasks?: () => void;
+  onViewCalendar?: () => void;
+};
+
+export const Homepage = ({ onViewAllTasks, onViewCalendar }: HomepageProps) => {
   const { displayName, loadingUser, sortedUpcomingTasks, loadingTasks } =
     useHomepage();
 
@@ -66,6 +72,23 @@ export const Homepage = () => {
 
       <div className="card bg-base-100 shadow-md">
         <div className="card-body space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold">Next 7 days</div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={onViewCalendar}
+              disabled={!onViewCalendar}
+            >
+              View calendar
+            </button>
+          </div>
+          <TaskCalendarWeekWidget />
+        </div>
+      </div>
+
+      <div className="card bg-base-100 shadow-md">
+        <div className="card-body space-y-3">
           <div className="text-lg font-semibold">Upcoming</div>
 
           {loadingTasks ? (
@@ -105,7 +128,11 @@ export const Homepage = () => {
           )}
 
           <div className="card-actions justify-end">
-            <button className="btn btn-primary btn-sm" disabled>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={onViewAllTasks}
+              disabled={!onViewAllTasks}
+            >
               View all tasks
             </button>
           </div>
