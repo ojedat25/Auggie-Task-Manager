@@ -161,6 +161,9 @@ def join_study_group(request, groupID):
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if group.private:
+        return Response({"error": "Cannot join private study group. You must be invited by the group creator."}, status=status.HTTP_403_FORBIDDEN)
+
     group.members.add(request.user)
     return Response({"message": "Joined study group successfully."}, status=status.HTTP_200_OK)
 

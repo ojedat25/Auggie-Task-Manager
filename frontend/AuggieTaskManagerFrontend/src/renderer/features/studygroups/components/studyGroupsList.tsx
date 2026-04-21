@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useStudyGroups } from '../hooks/useStudyGroups';
 import { API_BASE } from '../../../../config';
 import { AuthService } from '../../auth/services/authService';
+import { Lock } from 'lucide-react';
+import { Globe } from 'lucide-react';
 
 const currentUser = AuthService.getCurrentUser();
 const currentUserID = currentUser?.user?.id;
@@ -41,29 +43,14 @@ export const StudyGroupList: React.FC<StudyGroupListProps> = ({ onCreateClick, o
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={handleToggle}
-              style={{
-                padding: '6px 14px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                borderRadius: '4px',
-                border: '1px solid #ccc',
-                background: showingAll ? '#f0f0f0' : '#1a73e8',
-                color: showingAll ? '#333' : '#fff',
-              }}
+              className="btn btn-primary"
+              
             >
               {showingAll ? 'View My Groups' : 'View All Groups'}
             </button>
             <button
               onClick={onCreateClick}
-              style={{
-                padding: '6px 14px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                borderRadius: '4px',
-                border: 'none',
-                background: '#34a853',
-                color: '#fff',
-              }}
+              className="btn btn-outline btn-primary shrink-0 whitespace-nowrap"
             >
               + Create Group
             </button>
@@ -114,9 +101,9 @@ export const StudyGroupList: React.FC<StudyGroupListProps> = ({ onCreateClick, o
                   <span style={{ fontSize: '18px', fontWeight: 600, paddingBottom: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {group.name}
                     {group.private ? (
-                      <span title="Private" style={{ fontSize: '14px' }}>🔒</span>
+                      <Lock/>
                     ) : (
-                      <span title="Public" style={{ fontSize: '14px' }}>🌐</span>
+                      <Globe/>
                     )}
                   </span>
                   <span style={{ fontSize: '14px', color: '#666', paddingBottom: '6px' }}>
@@ -128,47 +115,25 @@ export const StudyGroupList: React.FC<StudyGroupListProps> = ({ onCreateClick, o
                     {group.members.includes(currentUserID) ? (
                       <button
                         onClick={() => leaveStudyGroup(group.groupID)}
-                        style={{
-                          padding: '4px 12px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                          borderRadius: '4px',
-                          border: '1px solid #ccc',
-                          background: '#f0f0f0',
-                          color: '#333',
-                        }}
+                        className="btn btn-primary"
                       >
                         Leave
                       </button>
-                    ) : (
+                    ) : !group.private ? (
                       <button
                         onClick={() => joinStudyGroup(group.groupID)}
-                        style={{
-                          padding: '4px 12px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                          borderRadius: '4px',
-                          border: 'none',
-                          background: '#1a73e8',
-                          color: '#fff',
-                        }}
+                        className="btn btn-primary"
                       >
                         Join
                       </button>
+                    ) : (
+                      <span style={{ fontSize: '14px', color: '#666' }}>Private group - invitation only</span>
                     )}
                     {group.created_by === currentUserID && (
                       <>
                         <button
                           onClick={() => onEditClick(group.groupID)}
-                          style={{
-                            padding: '4px 12px',
-                            fontSize: '13px',
-                            cursor: 'pointer',
-                            borderRadius: '4px',
-                            border: '1px solid #ccc',
-                            background: '#fff',
-                            color: '#333',
-                          }}
+                          className="btn btn-primary"
                         >
                           Edit
                         </button>
@@ -178,15 +143,8 @@ export const StudyGroupList: React.FC<StudyGroupListProps> = ({ onCreateClick, o
                               deleteStudyGroup(group.groupID);
                             }
                           }}
-                          style={{
-                            padding: '4px 12px',
-                            fontSize: '13px',
-                            cursor: 'pointer',
-                            borderRadius: '4px',
-                            border: 'none',
-                            background: '#e53935',
-                            color: '#fff',
-                          }}
+                          className="btn btn-outline btn-primary shrink-0 whitespace-nowrap"
+                          
                         >
                           Delete
                         </button>
