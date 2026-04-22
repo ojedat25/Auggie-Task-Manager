@@ -198,6 +198,8 @@ def update_image(request, groupID):
     if 'image' not in request.FILES:
         return Response({"error": "No image provided."}, status=status.HTTP_400_BAD_REQUEST)
 
+    if group.image:
+        group.image.delete(save=False)
     group.image = request.FILES['image']
     group.save()
     return Response({"message": "Image updated successfully.", "image": group.image.url}, status=status.HTTP_200_OK)
