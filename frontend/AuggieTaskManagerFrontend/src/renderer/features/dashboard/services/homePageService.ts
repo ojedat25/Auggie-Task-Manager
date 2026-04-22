@@ -1,5 +1,4 @@
 import { axiosInstance } from '../../../api/axiosInstance';
-import type { Task } from '../../../types/task';
 import { AuthService } from '../../auth/services/authService';
 
 export type UpcomingTask = {
@@ -92,29 +91,31 @@ export function getMockUpcomingTasks(now = new Date()): UpcomingTask[] {
   ];
 }
 
-function toUpcomingTask(task: any): UpcomingTask {
-  // Backend Task uses due_date; keep UI using dueAt.
-  const dueAt: string =
-    (typeof task?.dueAt === 'string' && task.dueAt) ||
-    (typeof task?.due_date === 'string' && task.due_date) ||
-    (typeof task?.dueDate === 'string' && task.dueDate) ||
-    '';
+function toUpcomingTask(task: unknown): UpcomingTask {
+  const rec: UnknownRecord = isRecord(task) ? task : {};
 
-  const title: string =
-    (typeof task?.title === 'string' && task.title) ||
-    (typeof task?.name === 'string' && task.name) ||
-    'Untitled';
+  const str = (key: string): string | null => {
+    const v = rec[key];
+    return typeof v === 'string' && v.trim() ? v : null;
+  };
+
+  const num = (key: string): number | null => {
+    const v = rec[key];
+    return typeof v === 'number' ? v : null;
+  };
+
+  // Backend Task uses due_date; keep UI using dueAt.
+  const dueAt: string = str('dueAt') ?? str('due_date') ?? str('dueDate') ?? '';
+
+  const title: string = str('title') ?? str('name') ?? 'Untitled';
 
   const id: string =
-    (typeof task?.id === 'string' && task.id) ||
-    (typeof task?.id === 'number' && String(task.id)) ||
+    str('id') ??
+    (num('id') !== null ? String(num('id')) : null) ??
     fallbackId();
 
   const course: string | undefined =
-    (typeof task?.course === 'string' && task.course) ||
-    (typeof task?.course_name === 'string' && task.course_name) ||
-    (typeof task?.courseName === 'string' && task.courseName) ||
-    undefined;
+    str('course') ?? str('course_name') ?? str('courseName') ?? undefined;
 
   return { id, title, dueAt, course };
 }
@@ -145,42 +146,56 @@ export class HomePageService {
       return getMockUpcomingTasks();
     }
 
-    // Current backend exposes /moodle/tasks/ + custom /filter. No dedicated upcoming endpoint yet.
-    // We do a lightweight strategy:
-    // - Prefer filter endpoint if present
-    // - Otherwise fetch tasks and reduce client-side.
-    const limit = params?.limit ?? 5;
+    // If no limit is provided, fetch "everything" within the next N days.
+    const limit = params?.limit ?? 50;
     const days = params?.days ?? 7;
     const now = new Date();
     const end = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 
+    // Prefer the backend's dedicated endpoint.
     try {
-      const filterRes = await axiosInstance.get('/tasks/filter', {
+      const upcomingRes = await axiosInstance.get('/tasks/upcoming/', {
         params: {
-          start: now.toISOString(),
-          end: end.toISOString(),
+          limit,
+          days,
         },
       });
-      const data = Array.isArray(filterRes.data)
-        ? filterRes.data
-        : filterRes.data?.results;
+      const data = Array.isArray(upcomingRes.data)
+        ? upcomingRes.data
+        : upcomingRes.data?.results;
       const items = Array.isArray(data) ? data : [];
-      return items.map(toUpcomingTask).slice(0, limit);
+
+      // Defensive client-side filtering in case backend behavior changes.
+      return items
+        .map(toUpcomingTask)
+        .filter((t) => {
+          const due = new Date(t.dueAt);
+          return !Number.isNaN(due.getTime()) && due >= now && due <= end;
+        })
+        .sort(
+          (a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+        );
     } catch {
       // fall through
     }
 
-    const res = await axiosInstance.get('/tasks/');
-    const data = Array.isArray(res.data) ? res.data : res.data?.results;
-    const items: Task[] = Array.isArray(data) ? (data as Task[]) : [];
+    // Fallback: fetch all tasks and reduce client-side.
+    try {
+      const res = await axiosInstance.get('/tasks/');
+      const data = Array.isArray(res.data) ? res.data : res.data?.results;
+      const items = Array.isArray(data) ? data : [];
 
-    return items
-      .map(toUpcomingTask)
-      .filter((t) => {
-        const due = new Date(t.dueAt);
-        return !Number.isNaN(due.getTime()) && due >= now && due <= end;
-      })
-      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
-      .slice(0, limit);
+      return items
+        .map(toUpcomingTask)
+        .filter((t) => {
+          const due = new Date(t.dueAt);
+          return !Number.isNaN(due.getTime()) && due >= now && due <= end;
+        })
+        .sort(
+          (a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime()
+        );
+    } catch {
+      return getMockUpcomingTasks();
+    }
   }
 }

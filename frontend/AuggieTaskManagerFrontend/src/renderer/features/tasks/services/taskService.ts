@@ -31,6 +31,16 @@ export class TaskService {
       .filter((x): x is UpcomingTask => x !== null);
   }
 
+  static async getCalendarTasks(params?: {
+    start?: string;
+    end?: string;
+  }): Promise<ApiTask[]> {
+    const resp = await axiosInstance.get<ApiTask[]>(ENDPOINTS.TASKS_CALENDAR, {
+      params,
+    });
+    return resp.data;
+  }
+
   static async createTask(form: TaskForm): Promise<Task> {
     const response = await axiosInstance.post(ENDPOINTS.TASKS, {
       title: form.title,

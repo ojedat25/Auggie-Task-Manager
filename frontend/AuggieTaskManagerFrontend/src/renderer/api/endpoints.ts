@@ -13,6 +13,7 @@ export const ENDPOINTS = {
   PROFILE_DETAIL: (userId: number) => `/users/profile/${userId}/`,
 
   TASKS_UPCOMING: '/tasks/upcoming/',
+  TASKS_CALENDAR: '/tasks/calendar/',
 
   STUDY_GROUPS_ALL: '/groups/all/', // Endpoint to fetch all study groups
   STUDY_GROUPS: '/groups/', // Endpoint to fetch study groups the user is a member of, and to create new study groups

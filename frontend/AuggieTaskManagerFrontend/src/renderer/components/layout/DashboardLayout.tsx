@@ -19,6 +19,7 @@ import {
 import { Tasks } from '../../features/tasks/components/Tasks';
 import { Profile } from '../../features/profile/components/Profile';
 import { Homepage } from '../../features/dashboard/components/Homepage';
+import { TaskCalendar } from '../../features/dashboard/components/TaskCalendar';
 import { StudyGroupForm } from '../../features/studygroups/components/StudyGroupForm';
 export const DashboardLayout = () => {
   // Sidebar items to be used in the SideBar component
@@ -62,7 +63,12 @@ export const DashboardLayout = () => {
       case 'Profile':
         return <Profile />;
       case 'Homepage':
-        return <Homepage />;
+        return (
+          <Homepage
+            onViewAllTasks={() => setActiveItem('Task List')}
+            onViewCalendar={() => setActiveItem('Task Calendar')}
+          />
+        );
       case 'Settings':
         return <SettingsScreen />;
       case 'Task List':
@@ -72,7 +78,11 @@ export const DashboardLayout = () => {
           </div>
         );
       case 'Task Calendar':
-        return <div className="p-4">Task Calendar content</div>;
+        return (
+          <div className="p-4">
+            <TaskCalendar />
+          </div>
+        );
       case 'Study Groups':
         return (
           <div className="p-4">
