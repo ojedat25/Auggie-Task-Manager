@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 export type SideBarItem = { name: string; icon: LucideIcon };
 
 interface SideBarProps {
@@ -6,6 +7,7 @@ interface SideBarProps {
   activeItem: string | null;
   setActiveItem: (item: string) => void;
   handleLogout: () => Promise<void>;
+  drawerOpen: boolean;
 }
 
 export const SideBar = ({
@@ -13,9 +15,19 @@ export const SideBar = ({
   activeItem,
   setActiveItem,
   handleLogout,
+  drawerOpen,
 }: SideBarProps) => {
+  const [tooltipsArmed, setTooltipsArmed] = useState(false);
+
+  useEffect(() => {
+    if (!drawerOpen) {
+      setTooltipsArmed(false);
+    }
+  }, [drawerOpen]);
+
   // Handle the click event for the sidebar items
   const handleItemClick = (item: string) => {
+    setTooltipsArmed(false);
     if (item === 'Logout') {
       handleLogout();
       return;
@@ -35,15 +47,19 @@ export const SideBar = ({
       {sideBarItems.map((item) => (
         <li key={item.name}>
           <button
-            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${isActive(item.name) ? 'bg-primary text-white' : ''}`}
+            className={`${!drawerOpen && tooltipsArmed ? 'tooltip tooltip-right' : ''} ${
+              isActive(item.name) ? 'bg-primary text-white' : ''
+            }`}
             onClick={() => handleItemClick(item.name)}
+            onMouseDown={() => setTooltipsArmed(false)}
+            onMouseEnter={() => setTooltipsArmed(true)}
             data-tip={item.name}
           >
             <item.icon
               className={`my-1.5 inline-block size-4 ${getIconColor(item.name)}`}
             />
             <span
-              className={`is-drawer-close:hidden whitespace-nowrap truncate${getTextColor(item.name)}`}
+              className={`is-drawer-close:hidden whitespace-nowrap truncate ${getTextColor(item.name)}`}
             >
               {item.name}
             </span>

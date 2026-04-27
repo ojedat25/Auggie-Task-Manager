@@ -6,7 +6,7 @@ import { AlertCard } from '../../../components/common/AlertCard';
 import { SignUpForm } from './SignUpForm';
 import { AuthService } from '../services/authService';
 export const Signup = () => {
-  const { signup, error, message } = useAuth();
+  const { signup, error, message, clearFeedback } = useAuth();
 
   const initialFormData: SignupData = {
     firstname: '',
@@ -45,8 +45,12 @@ export const Signup = () => {
 
   return (
     <>
-      {message && <AlertCard type="success" message={message} />}
-      {error && <AlertCard type="error" message={error} />}
+      {message && (
+        <AlertCard type="success" message={message} onDismiss={clearFeedback} />
+      )}
+      {error && (
+        <AlertCard type="error" message={error} onDismiss={clearFeedback} />
+      )}
       <SignUpForm
         formData={formData}
         handleChange={handleChange}

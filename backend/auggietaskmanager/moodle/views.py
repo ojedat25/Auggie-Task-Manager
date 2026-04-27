@@ -68,12 +68,12 @@ class TaskViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if user_profile.moodle_url != moodle_url:
-            user_profile.moodle_url = moodle_url
-            user_profile.save(update_fields=['moodle_url'])
 
         try:
             tasks = sync_moodle_tasks(moodle_url, request.user)
+            if user_profile.moodle_url != moodle_url:
+                user_profile.moodle_url = moodle_url
+                user_profile.save(update_fields=['moodle_url'])
 
             serializer = self.get_serializer(tasks, many=True)
             return Response(
@@ -156,6 +156,10 @@ class TaskViewSet(viewsets.ModelViewSet):
         completed_param = request.query_params.get('completed')
         source_param = request.query_params.get('source')
 
+        # date range filtering
+        start_date = request.query_params.get('start')
+        end_date = request.query_params.get('end')
+
         # Validate source parameter
         allowed_sources = ['moodle', 'manual']
         if source_param and source_param not in allowed_sources:
@@ -177,6 +181,18 @@ class TaskViewSet(viewsets.ModelViewSet):
                 )
         if source_param:
             queryset = queryset.filter(source=source_param)
+
+        # Apply date range if provided.
+        if start_date and end_date:
+            try:
+                start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+                end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                queryset = queryset.exclude(due_date__isnull=True).filter(due_date__range=[start, end])
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid date format. Use ISO 8601 format.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

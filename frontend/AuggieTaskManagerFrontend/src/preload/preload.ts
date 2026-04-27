@@ -1,6 +1,7 @@
 import { contextBridge } from 'electron';
-import path from 'path';
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  getPath: (fileName: string) => path.join(__dirname, fileName),
-});
+/**
+ * Preload runs in an isolated, sandboxed context: no __dirname / path.join.
+ * Expose only APIs the renderer needs; extend via ipcRenderer + allowlist later.
+ */
+contextBridge.exposeInMainWorld('electronAPI', {});

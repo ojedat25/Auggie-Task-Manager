@@ -143,7 +143,7 @@ export const Profile: React.FC = () => {
   if (error) {
     return (
       <div className="p-4 space-y-4">
-        <AlertCard type="error" message={error} />
+        <AlertCard type="error" message={error} autoHideMs={null} />
       </div>
     );
   }
@@ -159,9 +159,19 @@ export const Profile: React.FC = () => {
       <div className="p-4 space-y-4">
         <h1 className="text-2xl font-bold">My Profile</h1>
         {successMessage && (
-          <AlertCard type="success" message={successMessage} />
+          <AlertCard
+            type="success"
+            message={successMessage}
+            onDismiss={() => setSuccessMessage(null)}
+          />
         )}
-        {error && <AlertCard type="error" message={error} />}
+        {error && (
+          <AlertCard
+            type="error"
+            message={error}
+            onDismiss={() => setError(null)}
+          />
+        )}
 
         <div className="card bg-base-100 shadow-md">
           <div className="card-body space-y-3">
@@ -274,7 +284,13 @@ export const Profile: React.FC = () => {
     <div className="p-4 space-y-4">
       <h1 className="text-2xl font-bold">My Profile</h1>
 
-      {successMessage && <AlertCard type="success" message={successMessage} />}
+      {successMessage && (
+        <AlertCard
+          type="success"
+          message={successMessage}
+          onDismiss={() => setSuccessMessage(null)}
+        />
+      )}
 
       <div className="card bg-base-100 shadow-md">
         <div className="card-body space-y-2">
@@ -290,17 +306,19 @@ export const Profile: React.FC = () => {
             <div>Minor: {minor || 'N/A'}</div>
             <div>Bio: {bio || 'N/A'}</div>
           </div>
-          <button className="btn btn-primary" onClick={startEditing}>
-            Edit Profile
-          </button>
-          <button
-            className="btn btn-error ml-auto"
-            onClick={handleDelete}
-            disabled={deleting || saving}
-          >
-            {deleting ? 'Deleting...' : saving ? 'Saving...' : 'Delete Account'}
-          </button>
         </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="btn btn-primary btn-sm px-4" onClick={startEditing}>
+          Edit Profile
+        </button>
+        <button
+          className="btn btn-error btn-sm px-4"
+          onClick={handleDelete}
+          disabled={deleting || saving}
+        >
+          {deleting ? 'Deleting...' : saving ? 'Saving...' : 'Delete Account'}
+        </button>
       </div>
     </div>
   );

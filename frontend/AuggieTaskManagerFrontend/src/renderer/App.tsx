@@ -13,6 +13,10 @@ import { AuthService } from './features/auth/services/authService';
 import { LoginLayout } from './components/layout/LogInLayout';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Homepage } from './features/dashboard/components/Homepage';
+import { applySavedThemeOnLoad } from './utils/theme';
+
+// Apply saved theme when the app starts
+applySavedThemeOnLoad();
 
 export const ProtectedRoute = () => {
   if (!AuthService.isAuthenticated()) return <Navigate to="/login" replace />;
@@ -32,8 +36,10 @@ function SessionExpiredListener(): null {
 }
 
 function App() {
+  const initialPath = AuthService.isAuthenticated() ? '/' : '/login';
+
   return (
-    <MemoryRouter initialEntries={['/login']}>
+    <MemoryRouter initialEntries={[initialPath]}>
       <SessionExpiredListener />
       <Routes>
         {/* Protected routes */}

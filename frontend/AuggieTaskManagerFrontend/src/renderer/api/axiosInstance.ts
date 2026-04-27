@@ -3,6 +3,7 @@
  * Set baseURL and add request/response interceptors (auth, errors) here.
  */
 import axios, { InternalAxiosRequestConfig } from 'axios';
+import { AuthService } from '../features/auth/services/authService';
 import { API_BASE } from '../../config';
 import { ENDPOINTS } from './endpoints';
 
@@ -26,7 +27,7 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     return config;
   }
 
-  const token = sessionStorage.getItem('auggie_token');
+  const token = AuthService.getToken();
   if (token) {
     config.headers.Authorization = `Token ${token}`;
   }
@@ -34,7 +35,7 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Response: on 401 from protected calls, clear session and notify the app (in-router navigation).
+// Response: on 401 from protected calls, clear persisted auth and notify the app (in-router navigation).
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -47,8 +48,8 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    sessionStorage.removeItem('auggie_token');
-    sessionStorage.removeItem('user');
+    AuthService.removeToken();
+    AuthService.removeUser();
     window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
 
     return Promise.reject(error);

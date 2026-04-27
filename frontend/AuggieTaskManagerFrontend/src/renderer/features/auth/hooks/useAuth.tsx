@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { AuthService } from '../services/authService';
 import { SignupData, LoginData } from '../../../types/user';
@@ -48,6 +48,11 @@ export const useAuth = () => {
     }
   };
 
+  const clearFeedback = useCallback(() => {
+    setError(null);
+    setMessage(null);
+  }, []);
+
   const logOut = async (): Promise<{ message: string } | null> => {
     setLoading(true);
     setError(null);
@@ -65,5 +70,5 @@ export const useAuth = () => {
     }
   };
 
-  return { loading, error, message, signup, logIn, logOut };
+  return { loading, error, message, signup, logIn, logOut, clearFeedback };
 };

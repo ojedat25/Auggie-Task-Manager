@@ -1,22 +1,27 @@
 import { SquareChevronLeft, SquareChevronRight } from 'lucide-react';
-import { useState } from 'react';
-export const NavBar = ({ title }: { title: string }) => {
-  const [isOpen, setIsOpen] = useState(false); // The state to open or close the sidebar
-  const handleToggle = () => {
-    setIsOpen(!isOpen); // Toggle the sidebar to open or close
-  };
-  const Icon = isOpen ? SquareChevronLeft : SquareChevronRight;
+
+export interface NavBarProps {
+  title: string;
+  drawerOpen: boolean;
+  onDrawerOpenChange: (open: boolean) => void;
+}
+
+export const NavBar = ({
+  title,
+  drawerOpen,
+  onDrawerOpenChange,
+}: NavBarProps) => {
+  const Icon = drawerOpen ? SquareChevronLeft : SquareChevronRight;
   return (
     <nav className="navbar w-full bg-base-300">
-      <label
-        htmlFor="my-drawer-4"
-        aria-label="open sidebar"
+      <button
+        type="button"
+        aria-label={drawerOpen ? 'Close sidebar' : 'Open sidebar'}
         className="btn btn-square btn-ghost"
-        onClick={handleToggle}
+        onClick={() => onDrawerOpenChange(!drawerOpen)}
       >
-        {/* Sidebar toggle icon */}
-        <Icon className="my-1.5 inline-block size-4" />
-      </label>
+        <Icon className="my-1.5 inline-block size-4" aria-hidden />
+      </button>
       <div className="px-4">{title}</div>
     </nav>
   );

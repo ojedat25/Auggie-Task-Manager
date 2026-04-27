@@ -18,6 +18,7 @@ import {
 import { Tasks } from '../../features/tasks/components/Tasks';
 import { Profile } from '../../features/profile/components/Profile';
 import { Homepage } from '../../features/dashboard/components/Homepage';
+import { TaskCalendar } from '../../features/dashboard/components/TaskCalendar';
 export const DashboardLayout = () => {
   // Sidebar items to be used in the SideBar component
   const sideBarItems = [
@@ -34,6 +35,7 @@ export const DashboardLayout = () => {
   const [activeItem, setActiveItem] = useState<string>('Homepage'); // The active item in the sidebar
   const [message, setMessage] = useState<string | null>(null); // The message to be displayed in the AlertCard
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // The error message to be displayed in the AlertCard
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { logOut, error } = useAuth();
 
@@ -48,12 +50,22 @@ export const DashboardLayout = () => {
     }
   };
 
+  const handleSidebarItemChange = (item: string) => {
+    setActiveItem(item);
+    setDrawerOpen(false);
+  };
+
   const renderContent = () => {
     switch (activeItem) {
       case 'Profile':
         return <Profile />;
       case 'Homepage':
-        return <Homepage />;
+        return (
+          <Homepage
+            onViewAllTasks={() => setActiveItem('Task List')}
+            onViewCalendar={() => setActiveItem('Task Calendar')}
+          />
+        );
       case 'Settings':
         return <SettingsScreen />;
       case 'Task List':
@@ -63,7 +75,11 @@ export const DashboardLayout = () => {
           </div>
         );
       case 'Task Calendar':
-        return <div className="p-4">Task Calendar content</div>;
+        return (
+          <div className="p-4">
+            <TaskCalendar />
+          </div>
+        );
       case 'Study Groups':
         return <div className="p-4">Study Groups content</div>;
       default:
@@ -73,13 +89,35 @@ export const DashboardLayout = () => {
 
   return (
     <>
-      {message && <AlertCard type="success" message={message} />}
-      {errorMessage && <AlertCard type="error" message={errorMessage} />}
+      {message && (
+        <AlertCard
+          type="success"
+          message={message}
+          onDismiss={() => setMessage(null)}
+        />
+      )}
+      {errorMessage && (
+        <AlertCard
+          type="error"
+          message={errorMessage}
+          onDismiss={() => setErrorMessage(null)}
+        />
+      )}
       <div className="drawer lg:drawer-open">
-        <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+        <input
+          id="my-drawer-4"
+          type="checkbox"
+          className="drawer-toggle"
+          checked={drawerOpen}
+          onChange={(e) => setDrawerOpen(e.target.checked)}
+        />
         <div className="drawer-content">
           {/* Navbar */}
-          <NavBar title="Dashboard" />
+          <NavBar
+            title="Dashboard"
+            drawerOpen={drawerOpen}
+            onDrawerOpenChange={setDrawerOpen}
+          />
           {/* Page content here */}
           <div className="p-4">{renderContent()}</div>
         </div>
@@ -96,7 +134,8 @@ export const DashboardLayout = () => {
               handleLogout={handleLogout}
               sideBarItems={sideBarItems}
               activeItem={activeItem}
-              setActiveItem={setActiveItem}
+              setActiveItem={handleSidebarItemChange}
+              drawerOpen={drawerOpen}
             />
           </div>
         </div>
