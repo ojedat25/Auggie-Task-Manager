@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
-    ThemeMode,
-    applyTheme, 
-    applySavedThemeOnLoad
+  ThemeMode,
+  applyTheme,
+  applySavedThemeOnLoad,
 } from '../../../utils/theme';
 
 export const SettingsScreen = () => {
