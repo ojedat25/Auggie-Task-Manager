@@ -1,34 +1,20 @@
 import { useEffect, useState } from 'react';
-
-type ThemeMode = 'system' | 'light' | 'dark';
-
-// Key used to store the theme mode in localStorage
-const THEME_KEY = 'auggie-mode';
+import {
+    ThemeMode,
+    applyTheme, 
+    applySavedThemeOnLoad
+} from '../../../utils/theme';
 
 export const SettingsScreen = () => {
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
 
   useEffect(() => {
-    // Get the saved theme mode from localStorage
-    const saved = localStorage.getItem(THEME_KEY) as ThemeMode | null;
-    if (saved === 'light' || saved === 'dark' || saved === 'system') {
-      applyTheme(saved);
-      setThemeMode(saved);
-      return;
-    }
-    applyTheme('system');
-    setThemeMode('system');
+    const mode = applySavedThemeOnLoad();
+    setThemeMode(mode);
   }, []);
-
-  const applyTheme = (mode: ThemeMode) => {
-    const root = document.documentElement;
-    // If the mode is system, remove the data-theme attribute
-    if (mode === 'system') {
-      root.removeAttribute('data-theme');
-    } else {
-      root.setAttribute('data-theme', mode);
-    }
-    localStorage.setItem(THEME_KEY, mode);
+  // Updates the theme in DOM and localStorage
+  const handleThemeChange = (mode: ThemeMode) => {
+    applyTheme(mode);
     setThemeMode(mode);
   };
 
@@ -49,7 +35,8 @@ export const SettingsScreen = () => {
             <select
               className="select select-primary validator w-full max-w-xs"
               value={themeMode}
-              onChange={(e) => applyTheme(e.target.value as ThemeMode)}
+              // Updates theme in DOM and localStorage
+              onChange={(e) => handleThemeChange(e.target.value as ThemeMode)}
             >
               <option value="system">System default</option>
               <option value="light">Light</option>

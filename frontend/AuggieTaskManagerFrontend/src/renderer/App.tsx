@@ -13,22 +13,10 @@ import { AuthService } from './features/auth/services/authService';
 import { LoginLayout } from './components/layout/LogInLayout';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Homepage } from './features/dashboard/components/Homepage';
+import { applySavedThemeOnLoad } from './utils/theme';
 
-type ThemeMode = 'system' | 'light' | 'dark';
-const THEME_KEY = 'auggie-mode';
-// Applies saved theme when the app starts
-const applySavedThemeOnLoad = () => {
-  const saved = localStorage.getItem(THEME_KEY) as ThemeMode | null;
-  const root = document.documentElement;
-
-  // Force light/dark mode if user selected one of the options
-  if (saved === 'light' || saved === 'dark') {
-    root.setAttribute('data-theme', saved);
-  } else {
-    // system/default mode
-    root.removeAttribute('data-theme');
-  }
-};
+// Apply saved theme when the app starts
+applySavedThemeOnLoad();
 
 export const ProtectedRoute = () => {
   if (!AuthService.isAuthenticated()) return <Navigate to="/login" replace />;
@@ -49,11 +37,6 @@ function SessionExpiredListener(): null {
 
 function App() {
   const initialPath = AuthService.isAuthenticated() ? '/' : '/login';
-
-  // Run once the app loads so that the theme is correctly applied
-  useEffect(() => {
-    applySavedThemeOnLoad();
-  }, []);
 
   return (
     <MemoryRouter initialEntries={[initialPath]}>
