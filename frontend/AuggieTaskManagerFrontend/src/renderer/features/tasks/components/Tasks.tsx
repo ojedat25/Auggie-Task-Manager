@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { TaskList } from './TaskList';
 import { AlertCard } from '../../../components/common/AlertCard';
 import { useTasks } from '../hooks/useTasks';
@@ -26,6 +26,17 @@ export const Tasks = () => {
   useEffect(() => {
     void fetchTasks();
   }, [fetchTasks]);
+
+  const [showWeeklyTasks, setShowWeeklyTasks] = useState(true);
+  const [showMonthlyTasks, setShowMonthlyTasks] = useState(false);
+
+  const handleShowWeeklyTasks = () => {
+    setShowWeeklyTasks(true);
+  };
+
+  const handleShowMonthlyTasks = () => {
+    setShowMonthlyTasks(true);
+  };
 
   return (
     <div>

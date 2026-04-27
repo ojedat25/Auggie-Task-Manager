@@ -23,3 +23,21 @@ export type TaskForm = {
   course: string;
   due_date: string;
 };
+
+export type WeeklyTaskList = {
+  Sunday: Task[];
+  Monday: Task[];
+  Tuesday: Task[];
+  Wednesday: Task[];
+  Thursday: Task[];
+  Friday: Task[];
+  Saturday: Task[];
+};
+
+export type MonthlyTaskList = {
+  week1: Task[];
+  week2: Task[];
+  week3: Task[];
+  week4: Task[];
+  week5?: Task[];
+};

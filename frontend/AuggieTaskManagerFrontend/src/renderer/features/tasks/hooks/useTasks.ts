@@ -2,13 +2,15 @@
  * Task list state: load from the API, import from Moodle, update, and delete.
  */
 import { useState, useCallback, useMemo } from 'react';
-import { Task, TaskForm } from '../../../types/task';
+import { Task, TaskForm, WeeklyTaskList } from '../../../types/task';
 import { TaskService } from '../services/taskService';
 import { AuthService } from '../../auth/services/authService';
 
 /**
  * Returns task rows, Moodle URL UI state, and handlers wired to TaskService.
  */
+
+
 
 // weekStartsOn: 0 = Sunday, 1 = Monday
 export function startOfCurrentWeek(weekStartsOn: 0 | 1 = 1, date?: Date): Date {
@@ -107,11 +109,11 @@ export function useTasks() {
     }
   }, []);
 
-  const fetchWeeklyTasks = useCallback(async ( start?: Date, end?: Date ) => {
+  const fetchWeeklyTasks = useCallback(async ( params?: { start?: string, end?: string } ) => {
     try {
       const fetched = await TaskService.getTasks({
-        start: start.toISOString(),
-        end: end.toISOString(),
+        start: params?.start ?? startOfCurrentWeek().toISOString(),
+        end: params?.end ?? endOfCurrentWeek().toISOString(),
       });
       setTasks(fetched);
     } catch {
@@ -119,11 +121,11 @@ export function useTasks() {
     }
   }, []);
 
-  const fetchMonthlyTasks = useCallback(async ( start?: Date, end?: Date ) => {
+  const fetchMonthlyTasks = useCallback(async ( params?: { start?: string, end?: string } ) => {
     try {
       const fetched = await TaskService.getTasks({
-        start: start.toISOString(),
-        end: end.toISOString(),
+        start: params?.start ?? startOfCurrentMonth().toISOString(),
+        end: params?.end ?? endOfCurrentMonth().toISOString(),
       });
       setTasks(fetched);
     } catch {
@@ -233,5 +235,7 @@ export function useTasks() {
     createTask,
     completeTask,
     uncompleteTask,
+    fetchWeeklyTasks,
+    fetchMonthlyTasks,
   };
 }

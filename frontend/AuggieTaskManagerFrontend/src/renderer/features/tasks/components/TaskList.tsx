@@ -6,6 +6,7 @@ import { TaskFormModal } from './TaskFormModal';
 
 export interface TaskListProps {
   tasks: Task[];
+  title?: string;
   isAscending: boolean;
   setIsAscending: Dispatch<SetStateAction<boolean>>;
   completeTask: (task: Task) => Promise<void>;
@@ -19,6 +20,7 @@ export interface TaskListProps {
 
 export const TaskList = ({
   tasks,
+  title,
   isAscending,
   setIsAscending,
   completeTask,
@@ -76,7 +78,7 @@ export const TaskList = ({
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">
         <li className="flex items-center justify-between gap-2 p-4 pb-2 text-xl opacity-60 tracking-wide">
-          <span>Tasks</span>
+          <span>{title || 'Tasks'}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
