@@ -20,7 +20,6 @@ export const Tasks = () => {
     handleSyncMoodleTasks,
     isMoodleSyncing,
     fetchTasks,
-    fetchWeeklyTasks,
     updateTask,
     deleteTask,
     completeTask,
@@ -32,12 +31,8 @@ export const Tasks = () => {
   const [mode, setMode] = useState<'weekly' | 'monthly'>('weekly');
 
   useEffect(() => {
-    if (mode === 'weekly') {
-      void fetchWeeklyTasks();
-      return;
-    }
     void fetchTasks();
-  }, [fetchWeeklyTasks, fetchTasks, mode]);
+  }, [fetchTasks, mode]);
 
   const handleCreateClose = useCallback(() => {
     setIsCreateOpen(false);
