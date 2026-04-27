@@ -34,6 +34,8 @@ export type WeeklyTaskList = {
   Saturday: Task[];
 };
 
+export type DayOfWeek = keyof WeeklyTaskList;
+
 export type MonthlyTaskList = {
   week1: Task[];
   week2: Task[];

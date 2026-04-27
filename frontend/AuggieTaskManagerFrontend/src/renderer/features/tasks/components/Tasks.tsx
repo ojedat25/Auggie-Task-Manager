@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react';
-import { TaskList } from './TaskList';
+import { useCallback, useEffect, useState } from 'react';
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react';
+import { TaskFormModal } from './TaskFormModal';
+import { WeeklyTasks } from './WeeklyTasks';
+import { MonthlyTasks } from './MonthlyTasks';
 import { AlertCard } from '../../../components/common/AlertCard';
 import { useTasks } from '../hooks/useTasks';
+import { TaskForm } from '../../../types/task';
 
 export const Tasks = () => {
   const {
@@ -16,6 +20,7 @@ export const Tasks = () => {
     handleSyncMoodleTasks,
     isMoodleSyncing,
     fetchTasks,
+    fetchWeeklyTasks,
     updateTask,
     deleteTask,
     completeTask,
@@ -23,20 +28,77 @@ export const Tasks = () => {
     createTask,
   } = useTasks();
 
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [mode, setMode] = useState<'weekly' | 'monthly'>('weekly');
+
   useEffect(() => {
+    if (mode === 'weekly') {
+      void fetchWeeklyTasks();
+      return;
+    }
     void fetchTasks();
-  }, [fetchTasks]);
+  }, [fetchWeeklyTasks, fetchTasks, mode]);
 
-  const [showWeeklyTasks, setShowWeeklyTasks] = useState(true);
-  const [showMonthlyTasks, setShowMonthlyTasks] = useState(false);
+  const handleCreateClose = useCallback(() => {
+    setIsCreateOpen(false);
+  }, []);
 
-  const handleShowWeeklyTasks = () => {
-    setShowWeeklyTasks(true);
-  };
+  const handleCreateSubmit = useCallback(
+    async (values: TaskForm) => {
+      const ok = await createTask(values);
+      if (ok) {
+        setIsCreateOpen(false);
+      }
+    },
+    [createTask]
+  );
 
-  const handleShowMonthlyTasks = () => {
-    setShowMonthlyTasks(true);
-  };
+  const listHeader = (
+    <>
+      <span>Tasks</span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className="btn btn-primary btn-square btn-sm"
+          aria-pressed={isAscending}
+          aria-label={
+            isAscending
+              ? 'Sorted by due date ascending. Activate to sort descending.'
+              : 'Sorted by due date descending. Activate to sort ascending.'
+          }
+          title={
+            isAscending
+              ? 'Due date ascending — click for descending'
+              : 'Due date descending — click for ascending'
+          }
+          onClick={() => setIsAscending((prev) => !prev)}
+        >
+          {isAscending ? (
+            <ArrowUpNarrowWide className="h-4 w-4" aria-hidden />
+          ) : (
+            <ArrowDownNarrowWide className="h-4 w-4" aria-hidden />
+          )}
+        </button>
+        {hasMoodleUrl && (
+          <button
+            type="button"
+            className="btn btn-outline btn-primary shrink-0 whitespace-nowrap"
+            disabled={isMoodleSyncing}
+            onClick={() => handleSyncMoodleTasks()}
+          >
+            {isMoodleSyncing ? 'Syncing…' : 'Sync from Moodle'}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => setIsCreateOpen(true)}
+        >
+          Add Task
+        </button>
+      </div>
+    </>
+  );
 
   return (
     <div>
@@ -74,17 +136,25 @@ export const Tasks = () => {
           </fieldset>
         </div>
       )}
-      <TaskList
-        tasks={sortedTasks}
-        isAscending={isAscending}
-        setIsAscending={setIsAscending}
-        completeTask={completeTask}
-        uncompleteTask={uncompleteTask}
-        updateTask={updateTask}
-        deleteTask={deleteTask}
-        createTask={createTask}
-        onSyncMoodle={hasMoodleUrl ? handleSyncMoodleTasks : undefined}
-        isMoodleSyncing={hasMoodleUrl ? isMoodleSyncing : undefined}
+      <div className="flex items-center justify-between gap-2 p-4 pb-2 text-xl opacity-60 tracking-wide">
+        {listHeader}
+      </div>
+
+      {mode === 'weekly' ? (
+        <WeeklyTasks
+          tasks={sortedTasks}
+          completeTask={completeTask}
+          uncompleteTask={uncompleteTask}
+          updateTask={updateTask}
+          deleteTask={deleteTask}
+        />
+      ) : (
+        <MonthlyTasks />
+      )}
+      <TaskFormModal
+        open={isCreateOpen}
+        onClose={handleCreateClose}
+        onSubmit={handleCreateSubmit}
       />
     </div>
   );
