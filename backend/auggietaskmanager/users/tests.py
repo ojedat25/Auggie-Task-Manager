@@ -1,7 +1,8 @@
+from rest_framework.test import APIClient
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIClient
 
 from .models import UserProfile
 
@@ -67,7 +68,7 @@ class UserSignUpViewTest(TestCase):
         data = response.json()
         self.assertIn("error", data)
         
-# API tests for login endpoint   
+# API tests for login endpoint
 class UserLoginViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -77,7 +78,7 @@ class UserLoginViewTest(TestCase):
             password = "testpass123",
             email = "testuser@test.com",
         )
-    # Valid credentials return token and user data    
+    # Valid credentials return token and user data
     def test_login_success_returns_token_and_user(self):
         payload = {
             "username": "testuser",
