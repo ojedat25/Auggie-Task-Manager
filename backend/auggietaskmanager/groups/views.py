@@ -52,6 +52,69 @@ def get_all_groups(request):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
+def update_group(request, groupID):
+    """
+    PATCH: Updates one or more fields of a study group atomically.
+    Accepts: name, description, private, members
+    Only the creator of the group can update these fields.
+    """
+    try:
+        group = StudyGroup.objects.get(groupID=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Only the creator can update the group
+    if group.created_by != request.user:
+        return Response({"error": "Only the creator of the group can update it."}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Track what was updated
+    updated_fields = []
+    
+    # Update name if provided
+    if "name" in request.data:
+        group.name = request.data.get("name")
+        updated_fields.append("name")
+    
+    # Update description if provided
+    if "description" in request.data:
+        group.description = request.data.get("description")
+        updated_fields.append("description")
+    
+    # Update private if provided
+    if "private" in request.data:
+        private = request.data.get("private")
+        if private not in [True, False]:
+            return Response({"error": "Invalid privacy setting. Must be true or false."}, status=status.HTTP_400_BAD_REQUEST)
+        group.private = private
+        updated_fields.append("private")
+    
+    # Update members if provided
+    if "members" in request.data:
+        member_ids = request.data.get("members")
+        if not isinstance(member_ids, list):
+            return Response({"error": "members must be a list of user IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        members = User.objects.filter(id__in=member_ids)
+        if members.count() != len(member_ids):
+            return Response({"error": "One or more users not found."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        group.members.set(member_ids)
+        updated_fields.append("members")
+    
+    # Save all changes atomically
+    group.save()
+    
+    if not updated_fields:
+        return Response({"error": "No valid fields provided for update."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response(
+        {"message": f"Successfully updated: {', '.join(updated_fields)}"},
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
 def update_description(request, groupID):
     """
     PATCH: Updates the description of a study group. Only the creator of the group can update the description.
