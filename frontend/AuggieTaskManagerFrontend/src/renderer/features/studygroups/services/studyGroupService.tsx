@@ -75,7 +75,11 @@ export class StudyGroupService {
     private_: boolean
   ): Promise<void> {
     try {
-      await axiosInstance.patch(ENDPOINTS.STUDY_GROUPS_UPDATE_GROUP(groupID), { name, description, private: private_ });
+      await axiosInstance.patch(ENDPOINTS.STUDY_GROUPS_UPDATE_GROUP(groupID), {
+        name,
+        description,
+        private: private_,
+      });
     } catch (error: any) {
       throw new Error(
         error.response?.data?.error || 'Failed to update study group'

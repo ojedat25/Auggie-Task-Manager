@@ -20,7 +20,9 @@ export const ENDPOINTS = {
   STUDY_GROUPS_JOIN: (groupId: number) => `/groups/${groupId}/join/`, // Endpoint to join a study group
   STUDY_GROUPS_LEAVE: (groupId: number) => `/groups/${groupId}/leave/`, // Endpoint to leave a study group
   STUDY_GROUPS_CREATE: '/groups/', // Endpoint to create a new study group
-  STUDY_GROUPS_UPDATE_GROUP: (groupID: number) => `/groups/${groupID}/update_group/`,
-  STUDY_GROUPS_UPDATE_IMAGE: (groupID: number) => `/groups/${groupID}/update_image/`,
+  STUDY_GROUPS_UPDATE_GROUP: (groupID: number) =>
+    `/groups/${groupID}/update_group/`,
+  STUDY_GROUPS_UPDATE_IMAGE: (groupID: number) =>
+    `/groups/${groupID}/update_image/`,
   STUDY_GROUPS_DELETE: (groupID: number) => `/groups/${groupID}/delete/`,
 } as const;
