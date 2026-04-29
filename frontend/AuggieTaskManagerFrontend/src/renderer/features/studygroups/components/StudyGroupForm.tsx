@@ -28,6 +28,21 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
   const [description, setDescription] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!image) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(image);
+    setPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [image]);
 
   useEffect(() => {
     if (isEditing && groups.length === 0) {
@@ -171,7 +186,7 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
               />
             </div>
           )}
-          {image && (
+          {image && previewUrl && (
             <div style={{ textAlign: 'center' }}>
               <p
                 style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}
@@ -179,7 +194,7 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
                 New image:
               </p>
               <img
-                src={URL.createObjectURL(image)}
+                src={previewUrl}
                 alt="Preview"
                 style={{
                   width: '80px',
