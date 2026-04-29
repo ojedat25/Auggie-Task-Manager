@@ -6,6 +6,8 @@ export interface ElectronAPI {
   invoke?: (channel: string, ...args: unknown[]) => Promise<unknown>;
 }
 
+declare module '*.css';
+
 declare global {
   interface Window {
     electronAPI?: ElectronAPI;

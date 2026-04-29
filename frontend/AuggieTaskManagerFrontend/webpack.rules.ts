@@ -23,6 +23,7 @@ const typescriptRule: Required<ModuleOptions>['rules'][number] = {
   use: {
     loader: 'ts-loader',
     options: {
+      configFile: 'tsconfig.json',
       transpileOnly: true,
     },
   },
