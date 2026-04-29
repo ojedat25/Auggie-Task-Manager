@@ -11,13 +11,13 @@ from .models import UserProfile
 class UserProfileModelTest(TestCase):
     def test_profile_created_with_user(self):
         user = User.objects.create_user(username="testuser", password="testpassword", email="testuser@test.com")
-        profile = UserProfile.objects.create(user = user, schoolYear = "Sophomore", major = "CS", minor = "Math")
+        profile = UserProfile.objects.create(user=user, schoolYear="Sophomore", major="CS", minor="Math")
         self.assertEqual(profile.user, user)
         self.assertEqual(profile.schoolYear, "Sophomore")
     
     def test_profile_str_return_username(self):
-        user = User.objects.create_user(username = "jane", password = "pass", email = "j@ex.com")
-        profile = UserProfile.objects.create(user = user)
+        user = User.objects.create_user(username="jane", password="pass", email="j@ex.com")
+        profile = UserProfile.objects.create(user=user)
         self.assertEqual(str(profile), "jane")
 
 # API tests for signup endpoint
@@ -26,7 +26,7 @@ class UserSignUpViewTest(TestCase):
         self.client = APIClient()
         self.signup_url = reverse("users:signup")
 
-    # Succeful signup creates user and profile
+    # Successful signup creates user and profile
     def test_signup_success_creates_user_and_profile(self):
         payload = {
             "username": "newuser",
@@ -40,29 +40,33 @@ class UserSignUpViewTest(TestCase):
         }
         response = self.client.post(self.signup_url, payload, format="json")
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(User.objects.filter(username = "newuser").exists())
-        user = User.objects.get(username = "newuser")
-        self.assertTrue(UserProfile.objects.filter(user = user).exists())
+        user = User.objects.get(username="newuser")
+        self.assertEqual(user.email, payload["email"])
+        
+        profile = UserProfile.objects.get(user=user)
+        self.assertEqual(profile.schoolYear, payload["schoolyear"])
+        self.assertEqual(profile.major, payload["major"])
+        self.assertEqual(profile.minor, payload["minor"])
         
     # Signup should fail if username already exists
     def test_signup_fails_with_duplicate_username(self):
         User.objects.create_user(
-            username = "newuser",
-            password = "oldpass",
-            email = "old@test.com",
+            username="newuser",
+            password="oldpass",
+            email="old@test.com",
         )
         payload = {
             "username": "newuser",
             "password": "newpassword",
             "email": "newuser@test.com",
         }
-        response = self.client.post(self.signup_url, payload, format = "json")
+        response = self.client.post(self.signup_url, payload, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.json())
     
     def test_signup_fails_without_username(self):
         response = self.client.post(self.signup_url, {"password": "p", "email": "testuser@test.com"},
-                                    format = "json",
+                                    format="json",
         )
         self.assertEqual(response.status_code, 400)
         data = response.json()
@@ -74,9 +78,9 @@ class UserLoginViewTest(TestCase):
         self.client = APIClient()
         self.login_url = reverse("users:login")
         self.user = User.objects.create_user(
-            username = "testuser",
-            password = "testpass123",
-            email = "testuser@test.com",
+            username="testuser",
+            password="testpass123",
+            email="testuser@test.com",
         )
     # Valid credentials return token and user data
     def test_login_success_returns_token_and_user(self):
@@ -84,7 +88,7 @@ class UserLoginViewTest(TestCase):
             "username": "testuser",
             "password": "testpass123",
         }
-        response = self.client.post(self.login_url, payload, format = "json")
+        response = self.client.post(self.login_url, payload, format="json")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("token", data)
@@ -97,7 +101,7 @@ class UserLoginViewTest(TestCase):
             "username": "testuser",
             "password": "wrongpass",
         }
-        response = self.client.post(self.login_url, payload, format = "json")
+        response = self.client.post(self.login_url, payload, format="json")
         self.assertEqual(response.status_code, 401)
         self.assertIn("error", response.json())
         
