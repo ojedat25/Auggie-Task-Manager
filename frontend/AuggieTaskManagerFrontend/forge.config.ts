@@ -28,7 +28,7 @@ const config: ForgeConfig = {
     new WebpackPlugin({
       mainConfig,
       devContentSecurityPolicy:
-        "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:; connect-src 'self' http://127.0.0.1:8000 http://localhost:8000; img-src 'self' data: http://127.0.0.1:8000 http://localhost:8000",
+        "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:; connect-src 'self' http://127.0.0.1:8000 http://localhost:8000; img-src 'self' data: blob: http://127.0.0.1:8000 http://localhost:8000",
       renderer: {
         config: rendererConfig,
         entryPoints: [

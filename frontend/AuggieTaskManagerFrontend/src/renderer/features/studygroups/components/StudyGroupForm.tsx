@@ -48,15 +48,23 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
     if (isEditing && groups.length === 0) {
       fetchAllStudyGroups();
     }
-  }, []);
+  }, [isEditing, groups.length, fetchAllStudyGroups]);
 
   useEffect(() => {
+    if (!isEditing) {
+      setName('');
+      setDescription('');
+      setIsPrivate(false);
+      setImage(null);
+      return;
+    }
+
     if (existingGroup) {
       setName(existingGroup.name);
       setDescription(existingGroup.description);
       setIsPrivate(existingGroup.private);
     }
-  }, [existingGroup]);
+  }, [isEditing, existingGroup]);
 
   const handleSubmit = async () => {
     if (isEditing && groupID) {

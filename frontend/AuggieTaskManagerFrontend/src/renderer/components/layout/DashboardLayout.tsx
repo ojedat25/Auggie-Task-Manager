@@ -100,6 +100,7 @@ export const DashboardLayout = () => {
         return (
           <div className="p-4">
             <StudyGroupForm
+              key="study-group-form-create"
               onBack={async () => {
                 setActiveItem('Study Groups');
               }}
@@ -110,6 +111,7 @@ export const DashboardLayout = () => {
         return (
           <div className="p-4">
             <StudyGroupForm
+              key={`study-group-form-edit-${editingGroupID}`}
               groupID={editingGroupID}
               onBack={() => setActiveItem('Study Groups')}
             />
