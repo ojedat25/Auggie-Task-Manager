@@ -59,10 +59,7 @@ export const DashboardLayout = () => {
   };
 
   // Derive the navbar title from the active sidebar item (and normalize sub-pages)
-  const navTitle = (() => {
-    if (activeItem.startsWith('Study Groups')) return 'Study Groups';
-    return activeItem;
-  })();
+    const navTitle = activeItem.startsWith('Study Groups') ? 'Study Groups' : activeItem;
 
   const renderContent = () => {
     switch (activeItem) {
