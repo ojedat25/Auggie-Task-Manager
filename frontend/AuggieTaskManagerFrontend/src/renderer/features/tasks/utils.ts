@@ -125,14 +125,16 @@ export function buildWeeklyTaskLists(
   weekEnd: Date
 ): WeeklyTaskList {
   const tasksInWeek = filterTasksDueInRange(tasks, weekStart, weekEnd);
-  return Object.fromEntries(
-    WEEKDAYS.map((weekdayName, weekdayIndex) => [
-      weekdayName,
-      tasksInWeek.filter(
-        (task) => (new Date(task.due_date).getDay() + 6) % 7 === weekdayIndex
-      ),
-    ])
+  const grouped = Object.fromEntries(
+    WEEKDAYS.map((day) => [day, [] as Task[]])
   ) as WeeklyTaskList;
+
+  tasksInWeek.forEach((task) => {
+    const dayLabel = weekdayLabelForLocalDate(new Date(task.due_date));
+    grouped[dayLabel].push(task);
+  });
+
+  return grouped;
 }
 
 export type TasksByCalendarDay = {
@@ -149,19 +151,23 @@ export function buildTasksByCalendarDays(
   const monthIndex = monthStart.getMonth();
   const lastDayOfMonth = monthEnd.getDate();
   const tasksInMonth = filterTasksDueInRange(tasks, monthStart, monthEnd);
+
+  const tasksByDayMap = new Map<number, Task[]>();
+  tasksInMonth.forEach((task) => {
+    const dueDate = new Date(task.due_date);
+    const day = dueDate.getDate();
+    const list = tasksByDayMap.get(day) ?? [];
+    list.push(task);
+    tasksByDayMap.set(day, list);
+  });
+
   const tasksByCalendarDays: TasksByCalendarDay[] = [];
   for (let dayOfMonth = 1; dayOfMonth <= lastDayOfMonth; dayOfMonth++) {
     const calendarDate = new Date(year, monthIndex, dayOfMonth);
-    const tasksForDay = tasksInMonth.filter((task) => {
-      const dueDate = new Date(task.due_date);
-      if (Number.isNaN(dueDate.getTime())) return false;
-      return (
-        dueDate.getFullYear() === year &&
-        dueDate.getMonth() === monthIndex &&
-        dueDate.getDate() === dayOfMonth
-      );
+    tasksByCalendarDays.push({
+      date: calendarDate,
+      tasks: tasksByDayMap.get(dayOfMonth) ?? [],
     });
-    tasksByCalendarDays.push({ date: calendarDate, tasks: tasksForDay });
   }
   return tasksByCalendarDays;
 }

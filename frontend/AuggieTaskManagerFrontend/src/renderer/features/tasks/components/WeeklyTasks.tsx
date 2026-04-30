@@ -101,10 +101,9 @@ export const WeeklyTasks = ({
         return (
           <div
             key={day}
-            className={
-              'rounded-box border border-base-300 bg-base-100 p-2 ' +
-              (isTodaySection ? 'ring-2 ring-primary ring-inset ' : '')
-            }
+            className={`rounded-box border border-base-300 bg-base-100 p-2 ${
+              isTodaySection ? 'ring-2 ring-primary ring-inset ' : ''
+            }`}
             aria-current={isTodaySection ? 'date' : undefined}
           >
             <h2 className="text-2xl font-bold">{day}</h2>

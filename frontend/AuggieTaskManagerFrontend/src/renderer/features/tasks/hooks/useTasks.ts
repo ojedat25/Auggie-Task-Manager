@@ -119,37 +119,6 @@ export function useTasks() {
     }
   }, []);
 
-  /** Optional calendar-range fetch (UI uses full `fetchTasks` + client filters). */
-  const fetchWeeklyTasks = useCallback(
-    async (params?: { start?: string; end?: string }) => {
-      try {
-        const fetched = await TaskService.getTasks({
-          start: params?.start ?? startOfCurrentWeek().toISOString(),
-          end: params?.end ?? endOfCurrentWeek().toISOString(),
-        });
-        setTasks(fetched);
-      } catch {
-        setErrorMessage('Error fetching weekly tasks');
-      }
-    },
-    []
-  );
-
-  /** Optional calendar-range fetch (UI uses full `fetchTasks` + client filters). */
-  const fetchMonthlyTasks = useCallback(
-    async (params?: { start?: string; end?: string }) => {
-      try {
-        const fetched = await TaskService.getTasks({
-          start: params?.start ?? startOfCurrentMonth().toISOString(),
-          end: params?.end ?? endOfCurrentMonth().toISOString(),
-        });
-        setTasks(fetched);
-      } catch {
-        setErrorMessage('Error fetching monthly tasks');
-      }
-    },
-    []
-  );
 
   useEffect(() => {
     void fetchTasks();
@@ -273,8 +242,6 @@ export function useTasks() {
     revertMoodleUrlFromProfile,
     isMoodleSyncing,
     fetchTasks,
-    fetchWeeklyTasks,
-    fetchMonthlyTasks,
     updateTask,
     deleteTask,
     createTask,
