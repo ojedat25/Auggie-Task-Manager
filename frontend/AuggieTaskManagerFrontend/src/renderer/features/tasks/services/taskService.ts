@@ -19,9 +19,7 @@ export class TaskService {
       params,
     });
     return response.data;
-
   }
-
 
   static async loadMoodleCalendarUrl(moodle_url: string): Promise<Task[]> {
     const response = await axiosInstance.post(ENDPOINTS.MOODLE_CALENDAR_URL, {
@@ -90,8 +88,6 @@ export type ApiTask = {
   source: 'manual' | 'moodle';
   completed: boolean;
 };
-
-
 
 export type UpcomingTask = {
   id: string;
