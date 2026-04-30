@@ -145,7 +145,7 @@ export const DashboardLayout = () => {
             onDrawerOpenChange={setDrawerOpen}
           />
           {/* Page content here */}
-          <div className="p-4">{renderContent()}</div>
+          <div className="p-4 pt-20">{renderContent()}</div>
         </div>
 
         <div className="drawer-side is-drawer-close:overflow-visible">
@@ -155,7 +155,7 @@ export const DashboardLayout = () => {
             className="drawer-overlay"
           ></label>
 
-          <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+          <div className="flex min-h-full flex-col items-start bg-base-200 transition-[width] duration-150 ease-out is-drawer-close:w-14 is-drawer-open:w-64">
             {/* Sidebar content here */}
             <SideBar
               handleLogout={handleLogout}

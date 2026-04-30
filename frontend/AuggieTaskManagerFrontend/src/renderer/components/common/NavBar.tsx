@@ -13,7 +13,15 @@ export const NavBar = ({
 }: NavBarProps) => {
   const Icon = drawerOpen ? SquareChevronLeft : SquareChevronRight;
   return (
-    <nav className="navbar w-full bg-base-300">
+    <nav
+      className={
+        'navbar fixed top-0 z-30 bg-base-300 shadow-sm border-b border-base-200 transition-[left,width] duration-150 ease-out ' +
+        'left-0 right-0 w-full ' +
+        (drawerOpen
+          ? 'lg:left-64 lg:w-[calc(100%-16rem)]'
+          : 'lg:left-14 lg:w-[calc(100%-3.5rem)]')
+      }
+    >
       <button
         type="button"
         aria-label={drawerOpen ? 'Close sidebar' : 'Open sidebar'}
