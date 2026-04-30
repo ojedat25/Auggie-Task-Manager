@@ -107,9 +107,14 @@ export const WeeklyTasks = ({
             aria-current={isTodaySection ? 'date' : undefined}
           >
             <h2 className="text-2xl font-bold">
-              {day}{" "}
+              {day}{' '}
               <span className="text-lg font-normal opacity-50">
-                {new Date(weekStart.getTime() + WEEKDAYS.indexOf(day) * 86400000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {new Date(
+                  weekStart.getTime() + WEEKDAYS.indexOf(day) * 86400000
+                ).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                })}
               </span>
             </h2>
             {dayTasks.length === 0 ? (
