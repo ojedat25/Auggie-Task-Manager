@@ -73,7 +73,9 @@ export const TaskCard = ({
           <span
             className={taskBadgeClasses(task)}
             aria-label={`Source: ${task.source === 'moodle' ? 'Imported from Moodle' : 'Made by User'}`}
-            title={task.source === 'moodle' ? 'Imported from Moodle' : 'Made by User'}
+            title={
+              task.source === 'moodle' ? 'Imported from Moodle' : 'Made by User'
+            }
           >
             {task.source === 'moodle' ? 'Moodle' : 'User'}
           </span>
