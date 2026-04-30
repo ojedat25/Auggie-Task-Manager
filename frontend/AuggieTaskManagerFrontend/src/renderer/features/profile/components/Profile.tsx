@@ -138,25 +138,49 @@ export const Profile: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-4">Loading profile...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="skeleton h-8 w-40" />
+
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body space-y-3">
+            <div className="skeleton h-6 w-56" />
+            <div className="skeleton h-4 w-40" />
+            <div className="skeleton h-4 w-64" />
+
+            <div className="space-y-2 pt-2">
+              <div className="skeleton h-4 w-48" />
+              <div className="skeleton h-4 w-48" />
+              <div className="skeleton h-4 w-48" />
+              <div className="skeleton h-4 w-72" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="skeleton h-8 w-28" />
+          <div className="skeleton h-8 w-32" />
+        </div>
+      </div>
+    );
   }
   if (error) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="space-y-4">
         <AlertCard type="error" message={error} autoHideMs={null} />
       </div>
     );
   }
   // Fallback if no profile data is found
   if (!profile) {
-    return <div className="p-4"> No profile data found.</div>;
+    return <div>No profile data found.</div>;
   }
 
   const { user, schoolYear, major, minor, bio } = profile;
 
   if (isEditing) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="space-y-4">
         <h1 className="text-2xl font-bold">My Profile</h1>
         {successMessage && (
           <AlertCard
@@ -281,7 +305,7 @@ export const Profile: React.FC = () => {
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold">My Profile</h1>
 
       {successMessage && (
