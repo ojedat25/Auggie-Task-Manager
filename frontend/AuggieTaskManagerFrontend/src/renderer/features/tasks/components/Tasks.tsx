@@ -62,7 +62,7 @@ export const Tasks = () => {
         <div className="join shrink-0">
           <button
             type="button"
-            className={`btn join-item btn-sm ${taskViewMode === 'weekly' ? 'btn-active' : ''}`}
+            className={`btn join-item btn-sm ${taskViewMode === 'weekly' ? 'btn-active btn-primary' : ''}`}
             aria-pressed={taskViewMode === 'weekly'}
             onClick={() => setTaskViewMode('weekly')}
           >
@@ -70,7 +70,7 @@ export const Tasks = () => {
           </button>
           <button
             type="button"
-            className={`btn join-item btn-sm ${taskViewMode === 'monthly' ? 'btn-active' : ''}`}
+            className={`btn join-item btn-sm ${taskViewMode === 'monthly' ? 'btn-active btn-primary' : ''}`}
             aria-pressed={taskViewMode === 'monthly'}
             onClick={() => setTaskViewMode('monthly')}
           >
