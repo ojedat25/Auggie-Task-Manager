@@ -42,9 +42,7 @@ export const DashboardLayout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { logOut, error } = useAuth();
-  const [studyGroupKey] = useState(
-    () => AuthService.getCurrentUser()?.user?.id || 'guest'
-  );
+   const studyGroupKey = AuthService.getCurrentUser()?.user?.id || 'guest';
 
   // Handle the logout action
   const handleLogout = async () => {
