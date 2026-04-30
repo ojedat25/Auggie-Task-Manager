@@ -7,8 +7,17 @@ import { axiosInstance } from '../../../api/axiosInstance';
 import { ENDPOINTS } from '../../../api/endpoints';
 
 export class TaskService {
-  static async getTasks(): Promise<Task[]> {
-    const response = await axiosInstance.get(ENDPOINTS.TASKS);
+  static async getTasks(params?: {
+    start?: string;
+    end?: string;
+  }): Promise<Task[]> {
+    if (!params) {
+      const response = await axiosInstance.get(ENDPOINTS.TASKS);
+      return response.data;
+    }
+    const response = await axiosInstance.get<Task[]>(ENDPOINTS.TASKS_CALENDAR, {
+      params,
+    });
     return response.data;
   }
 

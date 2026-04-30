@@ -1,14 +1,30 @@
 /**
  * Task list state: load from the API, import from Moodle, update, and delete.
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Task, TaskForm } from '../../../types/task';
 import { TaskService } from '../services/taskService';
 import { AuthService } from '../../auth/services/authService';
+import {
+  offsetDateByCalendarMonths,
+  offsetDateByWeeks,
+  endOfCurrentMonth,
+  endOfCurrentWeek,
+  startOfCurrentMonth,
+  startOfCurrentWeek,
+} from '../utils';
+
+export {
+  startOfCurrentWeek,
+  endOfCurrentWeek,
+  startOfCurrentMonth,
+  endOfCurrentMonth,
+} from '../utils';
 
 /**
  * Returns task rows, Moodle URL UI state, and handlers wired to TaskService.
  */
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -22,8 +38,39 @@ export function useTasks() {
   );
   const [isMoodleSyncing, setIsMoodleSyncing] = useState(false);
 
+  const [taskViewMode, setTaskViewMode] = useState<'weekly' | 'monthly'>(
+    'weekly'
+  );
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
+
+  const weekStart = useMemo(() => {
+    const anchor = offsetDateByWeeks(new Date(), weekOffset);
+    return startOfCurrentWeek(1, anchor);
+  }, [weekOffset]);
+
+  const weekEnd = useMemo(() => {
+    const anchor = offsetDateByWeeks(new Date(), weekOffset);
+    return endOfCurrentWeek(1, anchor);
+  }, [weekOffset]);
+
+  const monthStart = useMemo(() => {
+    const anchor = offsetDateByCalendarMonths(new Date(), monthOffset);
+    return startOfCurrentMonth(anchor);
+  }, [monthOffset]);
+
+  const monthEnd = useMemo(() => {
+    const anchor = offsetDateByCalendarMonths(new Date(), monthOffset);
+    return endOfCurrentMonth(anchor);
+  }, [monthOffset]);
+
+  const revertMoodleUrlFromProfile = useCallback(() => {
+    const saved = AuthService.getCurrentUser()?.moodle_url;
+    setMoodleUrl(saved != null && saved !== '' ? saved : null);
+  }, []);
+
   /** Syncs Moodle calendar; replaces local tasks with the full list returned by the server. */
-  const handleSyncMoodleTasks = useCallback(async () => {
+  const handleSyncMoodleTasks = useCallback(async (): Promise<boolean> => {
     const url = (
       moodleUrl ??
       AuthService.getCurrentUser()?.moodle_url ??
@@ -31,7 +78,7 @@ export function useTasks() {
     ).trim();
     if (!url) {
       setErrorMessage('Add your Moodle calendar URL to sync.');
-      return;
+      return false;
     }
     setIsMoodleSyncing(true);
     setErrorMessage(null);
@@ -53,8 +100,10 @@ export function useTasks() {
           AuthService.saveUser({ ...current, moodle_url: url });
         }
       }
+      return true;
     } catch {
       setErrorMessage('Error syncing Moodle calendar');
+      return false;
     } finally {
       setIsMoodleSyncing(false);
     }
@@ -68,6 +117,30 @@ export function useTasks() {
     } catch {
       setErrorMessage('Error fetching tasks');
     }
+  }, []);
+
+  useEffect(() => {
+    void fetchTasks();
+  }, [fetchTasks]);
+
+  const prevWeek = useCallback(() => {
+    setWeekOffset((o) => o - 1);
+  }, []);
+  const nextWeek = useCallback(() => {
+    setWeekOffset((o) => o + 1);
+  }, []);
+  const resetWeekOffset = useCallback(() => {
+    setWeekOffset(0);
+  }, []);
+
+  const prevMonth = useCallback(() => {
+    setMonthOffset((o) => o - 1);
+  }, []);
+  const nextMonth = useCallback(() => {
+    setMonthOffset((o) => o + 1);
+  }, []);
+  const resetMonthOffset = useCallback(() => {
+    setMonthOffset(0);
   }, []);
 
   /** Persists task changes via PUT and merges the response into local state by id. */
@@ -165,6 +238,7 @@ export function useTasks() {
     setMoodleUrl,
     hasMoodleUrl,
     handleSyncMoodleTasks,
+    revertMoodleUrlFromProfile,
     isMoodleSyncing,
     fetchTasks,
     updateTask,
@@ -172,5 +246,19 @@ export function useTasks() {
     createTask,
     completeTask,
     uncompleteTask,
+    taskViewMode,
+    setTaskViewMode,
+    weekOffset,
+    monthOffset,
+    weekStart,
+    weekEnd,
+    monthStart,
+    monthEnd,
+    prevWeek,
+    nextWeek,
+    resetWeekOffset,
+    prevMonth,
+    nextMonth,
+    resetMonthOffset,
   };
 }
