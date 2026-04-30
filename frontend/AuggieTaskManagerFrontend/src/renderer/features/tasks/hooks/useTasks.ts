@@ -215,11 +215,17 @@ export function useTasks() {
 
   const sortedTasks = useMemo(() => {
     return [...tasks].sort((a, b) => {
-      const aDate = new Date(a.due_date);
-      const bDate = new Date(b.due_date);
+      const aTime =
+        a.due_date != null && a.due_date !== ''
+          ? new Date(a.due_date).getTime()
+          : Number.POSITIVE_INFINITY;
+      const bTime =
+        b.due_date != null && b.due_date !== ''
+          ? new Date(b.due_date).getTime()
+          : Number.POSITIVE_INFINITY;
       return isAscending
-        ? aDate.getTime() - bDate.getTime()
-        : bDate.getTime() - aDate.getTime();
+        ? aTime - bTime
+        : bTime - aTime;
     });
   }, [tasks, isAscending]);
 

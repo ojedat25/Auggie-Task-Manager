@@ -11,7 +11,7 @@ export interface Task {
   course: string;
   semester: 'Spring' | 'Fall' | '';
   external_id: string;
-  due_date: string;
+  due_date: string | null;
   completed: boolean;
   source: 'manual' | 'moodle';
   created_at: string;

@@ -15,7 +15,7 @@ export interface MonthlyTasksProps {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onResetMonth: () => void;
-  updateTask: (task: Task) => Promise<void>;
+  onEditTask?: (task: Task) => void;
   deleteTask: (taskId: number) => Promise<void>;
   completeTask: (task: Task) => Promise<void>;
   uncompleteTask: (task: Task) => Promise<void>;
@@ -40,7 +40,7 @@ export const MonthlyTasks = ({
   onPrevMonth,
   onNextMonth,
   onResetMonth,
-  updateTask,
+  onEditTask,
   deleteTask,
   completeTask,
   uncompleteTask,
@@ -110,8 +110,8 @@ export const MonthlyTasks = ({
                 tasks={dayTasks}
                 completeTask={completeTask}
                 uncompleteTask={uncompleteTask}
-                updateTask={updateTask}
                 deleteTask={deleteTask}
+                onEditTask={onEditTask}
               />
             )}
           </div>

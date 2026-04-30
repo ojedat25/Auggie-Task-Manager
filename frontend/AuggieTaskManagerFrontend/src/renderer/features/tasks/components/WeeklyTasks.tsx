@@ -17,7 +17,7 @@ export interface WeeklyTasksProps {
   onPrevWeek: () => void;
   onNextWeek: () => void;
   onResetWeek: () => void;
-  updateTask: (task: Task) => Promise<void>;
+  onEditTask?: (task: Task) => void;
   deleteTask: (taskId: number) => Promise<void>;
   completeTask: (task: Task) => Promise<void>;
   uncompleteTask: (task: Task) => Promise<void>;
@@ -39,7 +39,7 @@ export const WeeklyTasks = ({
   onPrevWeek,
   onNextWeek,
   onResetWeek,
-  updateTask,
+  onEditTask,
   deleteTask,
   completeTask,
   uncompleteTask,
@@ -124,8 +124,8 @@ export const WeeklyTasks = ({
                 tasks={dayTasks}
                 completeTask={completeTask}
                 uncompleteTask={uncompleteTask}
-                updateTask={updateTask}
                 deleteTask={deleteTask}
+                onEditTask={onEditTask}
               />
             )}
           </div>

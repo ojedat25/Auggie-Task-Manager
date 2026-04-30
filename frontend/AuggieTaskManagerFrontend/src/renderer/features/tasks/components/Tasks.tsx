@@ -5,7 +5,28 @@ import { WeeklyTasks } from './WeeklyTasks';
 import { MonthlyTasks } from './MonthlyTasks';
 import { AlertCard } from '../../../components/common/AlertCard';
 import { useTasks } from '../hooks/useTasks';
-import { TaskForm } from '../../../types/task';
+import { Task, TaskForm } from '../../../types/task';
+
+type TaskModalState =
+  | { mode: 'create' }
+  | { mode: 'edit'; task: Task }
+  | null;
+
+function toDateTimeLocal(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function toIsoOrNull(dateTimeLocal: string): string | null {
+  const raw = dateTimeLocal.trim();
+  if (raw === '') return null;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
 
 export const Tasks = () => {
   const {
@@ -41,7 +62,8 @@ export const Tasks = () => {
     resetMonthOffset,
   } = useTasks();
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [modalState, setModalState] = useState<TaskModalState>(null);
+  const [isModalSubmitting, setIsModalSubmitting] = useState(false);
   const [wantsMoodleUrlUpdate, setWantsMoodleUrlUpdate] = useState(false);
 
   const handleMoodleSyncAndCloseForm = useCallback(async () => {
@@ -56,19 +78,47 @@ export const Tasks = () => {
     setWantsMoodleUrlUpdate(false);
   }, [revertMoodleUrlFromProfile]);
 
-  const handleCreateClose = useCallback(() => {
-    setIsCreateOpen(false);
-  }, []);
+  const handleModalClose = useCallback(() => {
+    if (isModalSubmitting) return;
+    setModalState(null);
+  }, [isModalSubmitting]);
 
-  const handleCreateSubmit = useCallback(
+  const handleModalSubmit = useCallback(
     async (values: TaskForm) => {
-      const ok = await createTask(values);
-      if (ok) {
-        setIsCreateOpen(false);
+      if (!modalState) return;
+      setIsModalSubmitting(true);
+      try {
+        const normalized: TaskForm = {
+          ...values,
+          due_date: toIsoOrNull(values.due_date) ?? '',
+        };
+
+        if (modalState.mode === 'create') {
+          const ok = await createTask(normalized);
+          if (ok) {
+            setModalState(null);
+          }
+          return;
+        }
+
+        await updateTask({
+          ...modalState.task,
+          title: normalized.title,
+          description: normalized.description,
+          course: normalized.course,
+          due_date: toIsoOrNull(values.due_date),
+        });
+        setModalState(null);
+      } finally {
+        setIsModalSubmitting(false);
       }
     },
-    [createTask]
+    [createTask, modalState, updateTask]
   );
+
+  const handleEditTask = useCallback((task: Task) => {
+    setModalState({ mode: 'edit', task });
+  }, []);
 
   const listHeader = (
     <>
@@ -136,7 +186,7 @@ export const Tasks = () => {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={() => setIsCreateOpen(true)}
+          onClick={() => setModalState({ mode: 'create' })}
         >
           Add Task
         </button>
@@ -217,8 +267,8 @@ export const Tasks = () => {
           onResetWeek={resetWeekOffset}
           completeTask={completeTask}
           uncompleteTask={uncompleteTask}
-          updateTask={updateTask}
           deleteTask={deleteTask}
+          onEditTask={handleEditTask}
         />
       ) : (
         <MonthlyTasks
@@ -231,14 +281,31 @@ export const Tasks = () => {
           onResetMonth={resetMonthOffset}
           completeTask={completeTask}
           uncompleteTask={uncompleteTask}
-          updateTask={updateTask}
           deleteTask={deleteTask}
+          onEditTask={handleEditTask}
         />
       )}
       <TaskFormModal
-        open={isCreateOpen}
-        onClose={handleCreateClose}
-        onSubmit={handleCreateSubmit}
+        open={modalState != null}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+        submitting={isModalSubmitting}
+        title={modalState?.mode === 'edit' ? 'Edit task' : 'New task'}
+        descriptionText={
+          modalState?.mode === 'edit'
+            ? 'Update task details.'
+            : 'Add a task to your list.'
+        }
+        initialValues={
+          modalState?.mode === 'edit'
+            ? {
+                title: modalState.task.title ?? '',
+                description: modalState.task.description ?? '',
+                course: modalState.task.course ?? '',
+                due_date: toDateTimeLocal(modalState.task.due_date),
+              }
+            : undefined
+        }
       />
     </div>
   );
