@@ -1,4 +1,5 @@
 import { SignupData } from '../../../types/user';
+import { Link } from 'react-router-dom';
 
 type SignUpFormProps = {
   formData: SignupData;
@@ -144,6 +145,16 @@ export const SignUpForm = ({
       <button className="btn btn-neutral mt-4 col-span-2" type="submit">
         Sign Up
       </button>
+
+      <p className="text-center text-sm mt-2 col-span-2">
+        Already have an account?{' '}
+        <Link
+          to="/login"
+          className="text-primary font-semibold hover:underline"
+        >
+          Log in
+        </Link>
+      </p>
     </form>
   );
 };
