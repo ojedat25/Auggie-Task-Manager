@@ -123,6 +123,55 @@ class CalendarViewSerializerUnitTests(TestCase):
         self.assertFalse(manual_tasks[0]['is_imported'])
         self.assertTrue(moodle_tasks[0]['is_imported'])
 
+    def test_serializer_creates_course_for_new_manual_course(self):
+        """
+        Test that a manual task can be created with a new course string.
+
+        Verifies that the serializer will create the Course record if it does not exist.
+        """
+        # GIVEN: A new course value that is not already in the Course table
+        now = timezone.now()
+        payload = {
+            'title': 'New manual course task',
+            'description': 'Task with a course that was not imported',
+            'due_date': now,
+            'source': 'manual',
+            'completed': False,
+            'course': 'NEWCOURSE101',
+        }
+
+        serializer = TaskSerializer(data=payload)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        task = serializer.save(user=self.user)
+
+        self.assertEqual(task.course.courseID, 'NEWCOURSE101')
+        self.assertEqual(task.course.name, 'NEWCOURSE101')
+        self.assertEqual(task.source, 'manual')
+
+    def test_serializer_updates_task_with_new_manual_course(self):
+        """
+        Test that updating a task with a new course string works.
+
+        Verifies that the serializer will create the Course record when updating an existing task.
+        """
+        task = Task.objects.create(
+            user=self.user,
+            title='Manual Task Without Course',
+            description='A task that starts without a course',
+            due_date=timezone.now() + timedelta(days=1),
+            source='manual',
+            completed=False,
+        )
+
+        serializer = TaskSerializer(task, data={'course': 'NEWCOURSE202'}, partial=True)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        updated_task = serializer.save()
+
+        self.assertEqual(updated_task.course.courseID, 'NEWCOURSE202')
+        self.assertEqual(updated_task.course.name, 'NEWCOURSE202')
+
 
 class CalendarViewModelUnitTests(TestCase):
     """

@@ -1,4 +1,3 @@
-
 from rest_framework import status
 from rest_framework.decorators import APIView, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +11,7 @@ from .serializers import StudyGroupSerializer
 
 class StudyGroupListCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(request):
+    def get(self, request):
         """
         GET: Returns all groups the authenticated user is a member of
         """
@@ -26,24 +25,18 @@ class StudyGroupListCreateView(APIView):
         # The Response object is used to return the serialized data as an HTTP response. The data is typically returned in JSON format, which can be easily consumed by frontend applications or other clients.
         return Response(serializer.data)
         
-    def post(request):
-        """
-        POST: Creates a new StudyGroup
-        """
-
-        # The data from the request is passed to the StudyGroupSerializer for validation and deserialization. The serializer checks if the provided data meets the requirements defined in the StudyGroup model (e.g., required fields, field types, etc.). If the data is valid, the save method is called to create a new StudyGroup instance. The created_by field is set to the authenticated user (request.user) to associate the new group with its creator. Finally, the serialized data of the newly created group is returned in the response with a status code of 201 (Created). If the data is invalid, the errors from the serializer are returned in the response.
-        serializer = StudyGroupSerializer(data = request.data)
-
-        # The is_valid() method checks if the data provided in the request meets the validation criteria defined in the StudyGroupSerializer. If the data is valid, it proceeds to save the new StudyGroup instance. If the data is invalid, it returns the errors encountered during validation in the response.
+    def post(self, request):
+        
+        
+        serializer = StudyGroupSerializer(data=request.data)
+        
+        
         if serializer.is_valid():
-
-            # The save() method of the serializer is called to create a new StudyGroup instance based on the validated data. The created_by field is set to the authenticated user (request.user) to associate the new group with its creator. After saving the new group, the serialized data of the newly created group is returned in the response with a status code of 201 (Created).
-            serializer.save(created_by=request.user)
+            group = serializer.save(created_by=request.user)
+            group.members.add(request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
-        # If the data provided in the request is invalid according to the validation rules defined in the StudyGroupSerializer, the errors encountered during validation are returned in the response. This allows the client to understand what went wrong with the data they submitted and make necessary corrections before trying again.
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -59,12 +52,75 @@ def get_all_groups(request):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
+def update_group(request, groupID):
+    """
+    PATCH: Updates one or more fields of a study group atomically.
+    Accepts: name, description, private, members
+    Only the creator of the group can update these fields.
+    """
+    try:
+        group = StudyGroup.objects.get(groupID=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Only the creator can update the group
+    if group.created_by != request.user:
+        return Response({"error": "Only the creator of the group can update it."}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Track what was updated
+    updated_fields = []
+    
+    # Update name if provided
+    if "name" in request.data:
+        group.name = request.data.get("name")
+        updated_fields.append("name")
+    
+    # Update description if provided
+    if "description" in request.data:
+        group.description = request.data.get("description")
+        updated_fields.append("description")
+    
+    # Update private if provided
+    if "private" in request.data:
+        private = request.data.get("private")
+        if private not in [True, False]:
+            return Response({"error": "Invalid privacy setting. Must be true or false."}, status=status.HTTP_400_BAD_REQUEST)
+        group.private = private
+        updated_fields.append("private")
+    
+    # Update members if provided
+    if "members" in request.data:
+        member_ids = request.data.get("members")
+        if not isinstance(member_ids, list):
+            return Response({"error": "members must be a list of user IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        members = User.objects.filter(id__in=member_ids)
+        if members.count() != len(member_ids):
+            return Response({"error": "One or more users not found."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        group.members.set(member_ids)
+        updated_fields.append("members")
+    
+    # Save all changes atomically
+    group.save()
+    
+    if not updated_fields:
+        return Response({"error": "No valid fields provided for update."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response(
+        {"message": f"Successfully updated: {', '.join(updated_fields)}"},
+        status=status.HTTP_200_OK
+    )
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
 def update_description(request, groupID):
     """
     PATCH: Updates the description of a study group. Only the creator of the group can update the description.
     """
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
     
@@ -84,7 +140,7 @@ def update_group_name(request, groupID):
     """
 
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -104,7 +160,7 @@ def update_members(request, groupID):
     """
 
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -136,7 +192,7 @@ def update_private(request, groupID):
     private = request.data.get("private")
 
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
     
@@ -164,9 +220,12 @@ def join_study_group(request, groupID):
     POST: Adds the authenticated user to the specified study group
     """
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if group.private:
+        return Response({"error": "Cannot join private study group. You must be invited by the group creator."}, status=status.HTTP_403_FORBIDDEN)
 
     group.members.add(request.user)
     return Response({"message": "Joined study group successfully."}, status=status.HTTP_200_OK)
@@ -180,9 +239,47 @@ def leave_study_group(request, groupID):
     POST: Removes the authenticated user from the specified study group
     """
     try:
-        group = StudyGroup.objects.get(id=groupID)
+        group = StudyGroup.objects.get(groupID=groupID)
     except StudyGroup.DoesNotExist:
         return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
     
     group.members.remove(request.user)
     return Response({"message": "Left study group successfully."}, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_image(request, groupID):
+    try:
+        group = StudyGroup.objects.get(groupID=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if group.created_by != request.user:
+        return Response({"error": "Only the creator can update the image."}, status=status.HTTP_403_FORBIDDEN)
+
+    if 'image' not in request.FILES:
+        return Response({"error": "No image provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if group.image:
+        group.image.delete(save=False)
+    group.image = request.FILES['image']
+    group.save()
+    return Response({"message": "Image updated successfully.", "image": group.image.url}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_study_group(request, groupID):
+    try:
+        group = StudyGroup.objects.get(groupID=groupID)
+    except StudyGroup.DoesNotExist:
+        return Response({"error": "Study group not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if group.created_by != request.user:
+        return Response({"error": "Only the creator can delete this group."}, status=status.HTTP_403_FORBIDDEN)
+
+    if group.image:
+        group.image.delete(save=False)
+    group.delete()
+    return Response({"message": "Study group deleted successfully."}, status=status.HTTP_200_OK)
