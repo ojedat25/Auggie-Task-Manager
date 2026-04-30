@@ -11,6 +11,17 @@ export interface TaskCardProps {
   onDelete?: () => void;
 }
 
+function taskBadgeClasses(t: Task): string {
+  if (t.source === 'moodle') {
+    return t.completed
+      ? 'badge badge-outline border-info text-info opacity-70'
+      : 'badge badge-info text-info-content';
+  }
+  return t.completed
+    ? 'badge badge-outline border-secondary text-secondary opacity-70'
+    : 'badge badge-secondary text-secondary-content';
+}
+
 function formatDueParts(iso: string): {
   dateLabel: string;
   timeLabel: string;
@@ -55,17 +66,17 @@ export const TaskCard = ({
       : null;
   const dueParts = rawDue != null ? formatDueParts(rawDue) : null;
 
-  const sourceLabel =
-    task.source === 'manual'
-      ? 'Manual'
-      : task.source === 'moodle'
-        ? 'Moodle'
-        : null;
-
   return (
     <div className="flex w-full min-w-0 items-start gap-3 py-2">
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex min-w-0 items-center gap-2">
+          <span
+            className={taskBadgeClasses(task)}
+            aria-label={`Source: ${task.source === 'moodle' ? 'Imported from Moodle' : 'Made by User'}`}
+            title={task.source === 'moodle' ? 'Imported from Moodle' : 'Made by User'}
+          >
+            {task.source === 'moodle' ? 'Moodle' : 'User'}
+          </span>
           <h2
             className={`min-w-0 flex-1 truncate text-base font-semibold ${
               task.completed ? 'line-through opacity-70' : ''
@@ -88,8 +99,7 @@ export const TaskCard = ({
 
         {(rawDue != null ||
           (task.course != null && task.course !== '') ||
-          (task.semester != null && task.semester !== '') ||
-          sourceLabel != null) && (
+          (task.semester != null && task.semester !== '')) && (
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {rawDue != null && (
               <span className="inline-flex items-center gap-1 text-xs opacity-70">
@@ -121,9 +131,6 @@ export const TaskCard = ({
               <span className="badge badge-sm badge-outline opacity-90">
                 {task.semester}
               </span>
-            )}
-            {sourceLabel != null && (
-              <span className="badge badge-sm badge-ghost">{sourceLabel}</span>
             )}
           </div>
         )}
