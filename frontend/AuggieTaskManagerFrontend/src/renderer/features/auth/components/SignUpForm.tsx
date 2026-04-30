@@ -148,7 +148,10 @@ export const SignUpForm = ({
 
       <p className="text-center text-sm mt-2 col-span-2">
         Already have an account?{' '}
-        <Link to="/login" className="text-primary font-semibold hover:underline">
+        <Link
+          to="/login"
+          className="text-primary font-semibold hover:underline"
+        >
           Log in
         </Link>
       </p>
