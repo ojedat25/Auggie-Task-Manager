@@ -65,8 +65,12 @@ export const TaskCard = ({
           {task.due_date != null && task.due_date !== '' && (
             <p>Due date: {formatDueDate(task.due_date)}</p>
           )}
-          {task.course != null && task.course !== '' && <p>Course: {task.course}</p>}
-          {task.semester !== '' && task.semester !== null && <p>Semester: {task.semester}</p>}
+          {task.course != null && task.course !== '' && (
+            <p>Course: {task.course}</p>
+          )}
+          {task.semester !== '' && task.semester !== null && (
+            <p>Semester: {task.semester}</p>
+          )}
           <p>Completed: {task.completed ? 'Yes' : 'No'}</p>
           {task.source && <p>Source: {task.source}</p>}
           <div className="card-actions justify-end gap-1">
@@ -103,20 +107,25 @@ export const TaskCard = ({
           </div>
         </div>
       </div>
-      
+
       {/* Confirmation is shown before deleting the task */}
       {showDeleteModal && (
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
             <h3 className="font-bold text-lg">Delete task?</h3>
             <p className="py-2">
-              Are you sure you want to delete <span className="font-semibold">{task.title}</span>?
+              Are you sure you want to delete{' '}
+              <span className="font-semibold">{task.title}</span>?
             </p>
             <div className="modal-action">
               <button type="button" className="btn" onClick={closeDeleteModal}>
                 Cancel
               </button>
-              <button type="button" className="btn btn-error" onClick={confirmDelete}>
+              <button
+                type="button"
+                className="btn btn-error"
+                onClick={confirmDelete}
+              >
                 Confirm Delete
               </button>
             </div>
