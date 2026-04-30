@@ -58,6 +58,9 @@ export const DashboardLayout = () => {
     setDrawerOpen(false);
   };
 
+  // Derive the navbar title from the active sidebar item (and normalize sub-pages)
+    const navTitle = activeItem.startsWith('Study Groups') ? 'Study Groups' : activeItem;
+
   const renderContent = () => {
     switch (activeItem) {
       case 'Profile':
@@ -72,50 +75,36 @@ export const DashboardLayout = () => {
       case 'Settings':
         return <SettingsScreen />;
       case 'Task List':
-        return (
-          <div className="p-4">
-            <Tasks />
-          </div>
-        );
+        return <Tasks />;
       case 'Task Calendar':
-        return (
-          <div className="p-4">
-            <TaskCalendar />
-          </div>
-        );
+        return <TaskCalendar />;
       case 'Study Groups':
         return (
-          <div className="p-4">
-            <StudyGroupList
-              key={activeItem} // ← forces remount when navigating back
-              onCreateClick={() => setActiveItem('Study Groups Create')}
-              onEditClick={(groupID) => {
-                setEditingGroupID(groupID);
-                setActiveItem('Study Groups Edit');
-              }}
-            />
-          </div>
+          <StudyGroupList
+            key={activeItem}
+            onCreateClick={() => setActiveItem('Study Groups Create')}
+            onEditClick={(groupID) => {
+              setEditingGroupID(groupID);
+              setActiveItem('Study Groups Edit');
+            }}
+          />
         );
       case 'Study Groups Create':
         return (
-          <div className="p-4">
-            <StudyGroupForm
-              key="study-group-form-create"
-              onBack={async () => {
-                setActiveItem('Study Groups');
-              }}
-            />
-          </div>
+          <StudyGroupForm
+            key="study-group-form-create"
+            onBack={async () => {
+              setActiveItem('Study Groups');
+            }}
+          />
         );
       case 'Study Groups Edit':
         return (
-          <div className="p-4">
-            <StudyGroupForm
-              key={`study-group-form-edit-${editingGroupID}`}
-              groupID={editingGroupID}
-              onBack={() => setActiveItem('Study Groups')}
-            />
-          </div>
+          <StudyGroupForm
+            key={`study-group-form-edit-${editingGroupID}`}
+            groupID={editingGroupID}
+            onBack={() => setActiveItem('Study Groups')}
+          />
         );
       default:
         return <div className="p-4">Page Content</div>;
@@ -149,7 +138,7 @@ export const DashboardLayout = () => {
         <div className="drawer-content">
           {/* Navbar */}
           <NavBar
-            title="Dashboard"
+            title={navTitle}
             drawerOpen={drawerOpen}
             onDrawerOpenChange={setDrawerOpen}
           />

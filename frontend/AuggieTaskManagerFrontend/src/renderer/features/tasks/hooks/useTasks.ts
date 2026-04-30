@@ -14,7 +14,7 @@ export function useTasks() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const initialUser = AuthService.getCurrentUser();
   const [moodleUrl, setMoodleUrl] = useState<string | null>(
-    Boolean(initialUser?.moodle_url) ? initialUser.moodle_url : null
+    initialUser?.moodle_url || null
   );
   const [isAscending, setIsAscending] = useState<boolean>(true);
   const [hasMoodleUrl, setHasMoodleUrl] = useState<boolean>(
