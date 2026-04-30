@@ -20,6 +20,7 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
     loading,
     error,
   } = useStudyGroups();
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const isEditing = !!groupID;
   const existingGroup = groups.find((g) => g.groupID === groupID);
@@ -67,26 +68,31 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
   }, [isEditing, existingGroup]);
 
   const handleSubmit = async () => {
-    if (isEditing && groupID) {
-      const success = await updateStudyGroup(
-        groupID,
-        name,
-        description,
-        isPrivate
-      );
-      if (success && image) {
-        await StudyGroupService.updateStudyGroupImage(groupID, image);
-      }
-      if (success) onBack();
-    } else {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('description', description);
-      formData.append('private', String(isPrivate));
-      if (image) formData.append('image', image);
+    setLocalError(null);
+    try {
+      if (isEditing && groupID) {
+        const success = await updateStudyGroup(
+          groupID,
+          name,
+          description,
+          isPrivate
+        );
+        if (success && image) {
+          await StudyGroupService.updateStudyGroupImage(groupID, image);
+        }
+        if (success) onBack();
+      } else {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('private', String(isPrivate));
+        if (image) formData.append('image', image);
 
-      const result = await createStudyGroup(formData);
-      if (result) onBack();
+        const result = await createStudyGroup(formData);
+        if (result) onBack();
+      }
+    } catch (err: any) {
+      setLocalError(err?.message || 'Failed to save study group.');
     }
   };
 
@@ -96,8 +102,10 @@ export const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
         {isEditing ? 'Edit Study Group' : 'Create Study Group'}
       </h2>
 
-      {error && (
-        <p style={{ color: 'red', marginBottom: '16px' }}>Error: {error}</p>
+      {(localError || error) && (
+        <p style={{ color: 'red', marginBottom: '16px' }}>
+          Error: {localError ?? error}
+        </p>
       )}
 
       <div style={{ marginBottom: '16px' }}>
