@@ -1,22 +1,34 @@
 # AuggieTaskManager
 
-Electron desktop app with a Django REST backend and React frontend.
+Desktop task manager built with **Electron** and **React** (TypeScript), backed by a **Django REST** API and **PostgreSQL**. Users can manage tasks (including Moodle calendar import), profiles, authentication, and study groups.
+
+## Stack
+
+
+| Layer      | Technologies                                                                      |
+| ---------- | --------------------------------------------------------------------------------- |
+| Desktop UI | Electron (Electron Forge, Webpack), React 19, TypeScript, Tailwind CSS 4, DaisyUI |
+| API        | Django 5.2, Django REST Framework, token authentication                           |
+| Database   | PostgreSQL (default: `127.0.0.1:5432`)                                            |
+
+
+Linting: **Ruff** (Python, config in repo-root `pyproject.toml`), **ESLint** / **Prettier** (frontend `npm run lint` / `npm run format`).
 
 ## Prerequisites
 
-- **Node.js** (LTS) and npm — [Download](https://nodejs.org/en/download/current)
+- **Node.js** (LTS) and npm ([Node.js downloads](https://nodejs.org/en/download))
 - **Python** 3.10+
-- **PostgreSQL** (server running on port 5432) — [Download](https://www.postgresql.org/download/)
+- **PostgreSQL** running and reachable on port **5432** ([PostgreSQL downloads](https://www.postgresql.org/download/))
 
 ## 1. PostgreSQL setup
 
-Create the database and user that Django uses (defaults in `backend/auggietaskmanager/auggietaskmanager/settings.py`: user `auggie`, password `auggie`, database `auggietaskmanager`).
+Create the database role and database Django expects (defaults in `backend/auggietaskmanager/auggietaskmanager/settings.py`: user `auggie`, password `auggie`, database `auggietaskmanager`).
 
-**Windows (psql in a terminal):**
+**Windows (PowerShell, `psql`):**
 
 ```powershell
 # Connect as a superuser (e.g. postgres). Use the password you set for the postgres user.
-psql -U postgres 
+psql -U postgres
 
 # In the psql prompt:
 CREATE USER auggie WITH PASSWORD 'auggie';
@@ -41,9 +53,11 @@ GRANT ALL ON SCHEMA public TO auggie;
 \q
 ```
 
+On macOS with Homebrew, you can often use `psql postgres` instead of `sudo -u postgres psql`, depending on your install.
+
 ## 2. Backend (Django)
 
-Create virtual environment.
+Create and use a virtual environment, install dependencies, and apply migrations.
 
 **Windows:**
 
@@ -69,61 +83,103 @@ python manage.py migrate
 cd ../..
 ```
 
+Optional: Django admin at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/):
+
+```bash
+cd backend/auggietaskmanager
+../venv/bin/python manage.py createsuperuser   # macOS / Linux
+# Windows: ..\venv\Scripts\python.exe manage.py createsuperuser
+```
+
+The app also exposes REST routes under `/tasks/`, `/users/`, and `/groups/` (see `backend/auggietaskmanager/auggietaskmanager/urls.py`).
+
 ## 3. Frontend (Electron + React)
 
-From the repo root:
+From the repository root:
 
-```powershell
-cd frontend\AuggieTaskManagerFrontend
+```bash
+cd frontend/AuggieTaskManagerFrontend
 npm install
 ```
 
-**macOS / Linux:** use `cd frontend/AuggieTaskManagerFrontend` and `npm install`.
+On Windows, use `cd frontend\AuggieTaskManagerFrontend`.
 
 ## 4. Run the app
 
-### Option A: VS Code (Windows and macOS)
+The Electron client calls the API at **[http://127.0.0.1:8000](http://127.0.0.1:8000)** by default (`frontend/AuggieTaskManagerFrontend/src/config.ts`). The dev server policy in `forge.config.ts` allows requests to that host. If you change the backend host or port, update `API_BASE` (and CSP `connect-src` if needed).
 
-1. Open the repo in VS Code.
-2. Run the **Start App** task for your OS:
-   - **Terminal → Run Task…**, or **Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`) → **Tasks: Run Task**
-   - Choose **Start App (Windows)** or **Start App (macOS)**.
-   - On Windows, **Ctrl+Shift+B** runs the default build task (Start App (Windows)).
-3. Two terminals open: one for Django (backend), one for Electron (frontend). Keep both running while you work.
+Start **PostgreSQL**, then run **both** the Django server and the Electron app.
+
+### Option A: VS Code
+
+1. Open the repo in VS Code or Cursor.
+2. **Terminal -> Run Task...** (or Command Palette -> **Tasks: Run Task**).
+3. Choose **Start App (Windows)** or **Start App (macOS)**.
+  - On Windows, **Ctrl+Shift+B** runs the default build task (**Start App (Windows)**).
+
+Two terminals open: Django and Electron. Keep both running while developing.
 
 ### Option B: Two terminals manually
 
-**Terminal 1 – Backend (Windows):**
+**Terminal 1 (Backend)**
+
+Windows:
 
 ```powershell
 cd backend\auggietaskmanager
 ..\venv\Scripts\python.exe manage.py runserver
 ```
 
-**Terminal 1 – Backend (macOS / Linux):**
+macOS / Linux:
 
 ```bash
 cd backend/auggietaskmanager
 ../venv/bin/python manage.py runserver
 ```
 
-**Terminal 2 – Frontend (Windows):**
+This serves the API at [http://127.0.0.1:8000](http://127.0.0.1:8000) by default.
+
+**Terminal 2 (Frontend)**
+
+Windows:
 
 ```powershell
 cd frontend\AuggieTaskManagerFrontend
 npm start
 ```
 
-**Terminal 2 – Frontend (macOS / Linux):**
+macOS / Linux:
 
 ```bash
 cd frontend/AuggieTaskManagerFrontend
 npm start
 ```
 
+`npm start` runs **Electron Forge** (`electron-forge start`) with the Webpack plugin.
+
+## 5. Linting and formatting
+
+From the **repository root** (with the backend venv activated if `ruff` is only installed there, or install `ruff` globally):
+
+```bash
+ruff check backend
+ruff format backend
+```
+
+Frontend (from `frontend/AuggieTaskManagerFrontend`):
+
+```bash
+npm run lint
+npm run format
+```
+
 ## Project layout
 
-- `backend/venv` — Python virtualenv for Django
-- `backend/auggietaskmanager/` — Django project (e.g. `manage.py`, `auggietaskmanager/settings.py`)
-- `frontend/AuggieTaskManagerFrontend/` — Electron + Webpack + React app
-- `.vscode/tasks.json` — **Start App (Windows)** and **Start App (macOS)** run backend + frontend in two terminals
+- `backend/venv/`: Python virtualenv for Django (create locally; not committed by default).
+- `backend/auggietaskmanager/`: Django project (`manage.py`, `auggietaskmanager/settings.py`) and apps such as `moodle` (tasks / Moodle-related API), `users`, `groups`.
+- `frontend/AuggieTaskManagerFrontend/`: Electron Forge app (main, preload, React renderer).
+- `pyproject.toml`: Ruff configuration for the backend tree.
+- `.vscode/tasks.json`: **Start App (Windows)** and **Start App (macOS)** composite tasks (backend + frontend in parallel).
+
+For more detail on the renderer’s folder conventions, see `frontend/AuggieTaskManagerFrontend/README.md`.
+
